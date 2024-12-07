@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" viewBox="0 0 1234.6 1432.3">
+  <!-- Generator: Adobe Illustrator 29.0.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 192)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #a5bccc;
+      }
+
+      .st0, .st1, .st2, .st3, .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12, .st13 {
+        stroke: #575756;
+      }
+
+      .st14 {
+        font-size: 11px;
+      }
+
+      .st14, .st15, .st16, .st17, .st18, .st19, .st20, .st21, .st22, .st23, .st24, .st25, .st26 {
+        isolation: isolate;
+      }
+
+      .st14, .st15, .st16, .st18, .st19, .st20, .st21, .st22, .st23, .st24, .st25, .st26 {
+        font-family: ArialMT, Arial;
+      }
+
+      .st1 {
+        fill: #a2b9c8;
+      }
+
+      .st27 {
+        fill: #f54242;
+      }
+
+      .st2 {
+        fill: #8fa4b0;
+      }
+
+      .st15 {
+        font-size: 18.6px;
+      }
+
+      .st16 {
+        font-size: 11.2px;
+      }
+
+      .st3 {
+        fill: #bbd5e7;
+      }
+
+      .st18 {
+        font-size: 12px;
+      }
+
+      .st4 {
+        fill: #b4cdde;
+      }
+
+      .st28 {
+        fill: #fff;
+      }
+
+      .st5 {
+        fill: #adc5d5;
+      }
+
+      .st19 {
+        font-size: 17.7px;
+      }
+
+      .st20 {
+        font-size: 17.8px;
+      }
+
+      .st6 {
+        fill: #889ca8;
+      }
+
+      .st7 {
+        fill: #aec7d7;
+      }
+
+      .st8 {
+        fill: #c2def1;
+      }
+
+      .st21 {
+        font-size: 17.5px;
+      }
+
+      .st9 {
+        stroke-width: 3px;
+      }
+
+      .st9, .st10, .st11, .st12 {
+        fill: #c9e6fa;
+      }
+
+      .st10, .st29 {
+        stroke-width: 5px;
+      }
+
+      .st22 {
+        font-size: 18.3px;
+      }
+
+      .st29 {
+        fill: none;
+        stroke: #70b62c;
+      }
+
+      .st11 {
+        stroke-width: 8px;
+      }
+
+      .st13 {
+        fill: #96abb9;
+      }
+
+      .st23 {
+        font-size: 16.4px;
+      }
+
+      .st24 {
+        font-size: 19.7px;
+      }
+
+      .st25 {
+        font-size: 17.9px;
+      }
+
+      .st26 {
+        font-size: 18px;
+      }
+    </style>
+  </defs>
+  <g id="Floor">
+    <polygon id="BaseBackground" class="st11" points="1001.5 1.1 0 1.1 0 228.1 1001.5 228.1 1001.5 1432.3 1234.6 1432.3 1234.6 228.1 1234.6 1.1 1001.5 1.1"/>
+    <g id="ObjectCabinet317a">
+      <rect id="SpaceCabinet317a" class="st10" x="1113.8" y="883.4" width="120.1" height="50.8"/>
+      <rect id="DoorCabinet317a" class="st12" x="1109.9" y="899.7" width="7.8" height="18.1"/>
+      <g id="TextCabinet317a" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st26" transform="translate(1153 913.3)"><tspan x="0" y="0">317a</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectStairsFirst">
+      <rect id="SpaceStairsFirst" class="st9" x="203.9" y="158.5" width="92.1" height="66.8"/>
+      <g id="StepsSpaceStairsFirst1">
+        <rect id="_Ступенька24" class="st0" x="222.6" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька25" class="st0" x="228.6" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька26" class="st5" x="234.6" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька27" class="st5" x="240.9" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька28" class="st4" x="246.9" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька29" class="st4" x="252.9" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька30" class="st3" x="258.9" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька31" class="st8" x="264.9" y="159.4" width="6" height="32.5"/>
+        <rect id="_Ступенька32" class="st12" x="270.9" y="159.4" width="6" height="32.5"/>
+      </g>
+      <g id="StepsSpaceStairsFirst2">
+        <rect id="_Ступенька33" class="st7" x="222.6" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька34" class="st7" x="228.6" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька35" class="st1" x="234.6" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька36" class="st1" x="240.9" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька37" class="st13" x="246.9" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька38" class="st13" x="252.9" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька39" class="st2" x="258.9" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька40" class="st2" x="264.9" y="191.9" width="6" height="32.5"/>
+        <rect id="_Ступенька41" class="st6" x="270.9" y="191.9" width="6" height="32.5"/>
+      </g>
+      <rect id="DoorSpaceStairsFirst" class="st12" x="291.7" y="175.9" width="7.8" height="31.7"/>
+    </g>
+    <g id="ObjectStairsSecond">
+      <rect id="SpaceStairsSecond" class="st9" x="1002.1" y="667.5" width="66.4" height="92.1"/>
+      <g id="StepsStairsSecond2">
+        <rect id="_Ступенька" class="st0" x="1035.1" y="686.4" width="32.5" height="6"/>
+        <rect id="_Ступенька1" class="st0" x="1035.1" y="692.4" width="32.5" height="6"/>
+        <rect id="_Ступенька2" class="st5" x="1035.1" y="698.4" width="32.5" height="6"/>
+        <rect id="_Ступенька3" class="st5" x="1035" y="704.7" width="32.5" height="6"/>
+        <rect id="_Ступенька4" class="st4" x="1035" y="710.7" width="32.5" height="6"/>
+        <rect id="_Ступенька5" class="st4" x="1035" y="716.7" width="32.5" height="6"/>
+        <rect id="_Ступенька6" class="st3" x="1035" y="722.7" width="32.5" height="6"/>
+        <rect id="_Ступенька7" class="st8" x="1035" y="728.7" width="32.5" height="6"/>
+        <rect id="_Ступенька8" class="st12" x="1035" y="734.7" width="32.5" height="6"/>
+      </g>
+      <g id="StepsStairsSecond1">
+        <rect id="_Ступенька9" class="st7" x="1002.6" y="686.3" width="32.5" height="6"/>
+        <rect id="_Ступенька10" class="st7" x="1002.6" y="692.3" width="32.5" height="6"/>
+        <rect id="_Ступенька11" class="st1" x="1002.6" y="698.3" width="32.5" height="6"/>
+        <rect id="_Ступенька12" class="st1" x="1002.6" y="704.7" width="32.5" height="6"/>
+        <rect id="_Ступенька13" class="st13" x="1002.6" y="710.7" width="32.5" height="6"/>
+        <rect id="_Ступенька14" class="st13" x="1002.6" y="716.7" width="32.5" height="6"/>
+        <rect id="_Ступенька15" class="st2" x="1002.6" y="722.7" width="32.5" height="6"/>
+        <rect id="_Ступенька16" class="st2" x="1002.6" y="728.7" width="32.5" height="6"/>
+        <rect id="_Ступенька17" class="st6" x="1002.6" y="734.7" width="32.5" height="6"/>
+      </g>
+      <rect id="DoorStairsSecond" class="st12" x="1019.4" y="755.6" width="31.7" height="7.8"/>
+    </g>
+    <g id="ObjectBathroomMan">
+      <rect id="SpaceBathroomMan" class="st10" y="168.8" width="127.6" height="30.5"/>
+      <rect id="DoorBathroomMan" class="st12" x="123.5" y="177" width="7.8" height="15"/>
+      <g id="TextBathroomMan" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st16" transform="translate(60.3 187.9) scale(1.1 1)"><tspan x="0" y="0">С\у</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectBathroomWoman">
+      <rect id="SpaceBathroomWoman" class="st10" y="199.4" width="127.6" height="27.5"/>
+      <rect id="DoorBathroomWoman" class="st12" x="123.5" y="205.6" width="7.8" height="15"/>
+      <g id="TextBathroomWoman" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st18" transform="translate(61 215.6)"><tspan x="0" y="0">С\у</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet301">
+      <rect id="Space301" class="st10" x="2.1" y="-2.7" width="170.7" height="121.4"/>
+      <rect id="Door301" class="st12" x="139.5" y="114.9" width="16.6" height="7.7"/>
+      <g id="Text301" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_01" class="st17">
+              <g class="st17">
+                <text class="st25" transform="translate(71.2 66.8)"><tspan x="0" y="0">301</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet302">
+      <rect id="Space302" class="st10" x="172.1" y="-2.7" width="170.1" height="121.4"/>
+      <rect id="Door302" class="st12" x="311.3" y="114.8" width="16.6" height="7.7"/>
+      <g id="Text302" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_02" class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(240 65.6) scale(.9 1)"><tspan x="0" y="0">302</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet303">
+      <rect id="Space303" class="st10" x="342.2" y="-2.7" width="170" height="121.4"/>
+      <rect id="DoorFirst303" class="st12" x="482.6" y="114.7" width="16.6" height="7.8"/>
+      <g id="Text303" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(415.1 65.1) scale(.9 1)"><tspan x="0" y="0">303</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet304">
+      <rect id="Space304" class="st10" x="512.2" y="-2.7" width="170" height="121.4"/>
+      <rect id="Door304" class="st12" x="655.2" y="115.3" width="16.6" height="7.8"/>
+      <g id="Text304" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(585.2 64.8) scale(.9 1)"><tspan x="0" y="0">304</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet307">
+      <rect id="Space307" class="st10" x="892.2" y="164.9" width="110.5" height="60.9"/>
+      <rect id="Door307" class="st12" x="937.6" y="160.9" width="18.8" height="7.8"/>
+      <g id="Text307" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_07" class="st17">
+              <g class="st17">
+                <text class="st26" transform="translate(934.2 200)"><tspan x="0" y="0">307</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet308">
+      <rect id="Space308" class="st10" x="785" y="164.8" width="107.2" height="61"/>
+      <rect id="Door308" class="st12" x="846.5" y="160.9" width="18.1" height="7.8"/>
+      <g id="Text308" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_08" class="st17">
+              <g class="st17">
+                <text class="st26" transform="translate(828.2 200)"><tspan x="0" y="0">308</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet309a">
+      <rect id="Space309a" class="st10" x="411.9" y="163.9" width="109.6" height="61.4"/>
+      <rect id="Door309a" class="st12" x="408" y="181.8" width="7.8" height="18.1"/>
+      <g id="Text309a" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_09a" class="st17">
+              <g class="st17">
+                <text class="st26" transform="translate(448.3 199.9)"><tspan x="0" y="0">309a</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet310">
+      <rect id="Space310" class="st10" x="1003.4" y="-.8" width="230.5" height="120.1"/>
+      <rect id="Door310" class="st12" x="1085.6" y="115.5" width="17" height="7.6"/>
+      <g id="Text310" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st19" transform="translate(1114.9 59.5) scale(.9 1)"><tspan x="0" y="0">310</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet311">
+      <rect id="Space311" class="st10" x="1113.8" y="119.2" width="120.1" height="157"/>
+      <rect id="Door311" class="st12" x="1109.9" y="244.8" width="7.8" height="18"/>
+      <g id="Text311" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(1159.8 202.8)"><tspan x="0" y="0">311</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet314">
+      <rect id="Space314" class="st10" x="1113.9" y="273.7" width="120.1" height="157"/>
+      <rect id="Door314" class="st12" x="1110" y="283.8" width="7.8" height="18.7"/>
+      <g id="Text314" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st15" transform="translate(1160.4 354.4)"><tspan x="0" y="0">314</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet315">
+      <rect id="Space315" class="st10" x="1113.8" y="431.7" width="120.1" height="157"/>
+      <rect id="Door315" class="st12" x="1109.9" y="501.2" width="7.8" height="18.1"/>
+      <g id="Text315" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st24" transform="translate(1161.1 513) scale(.9 1)"><tspan x="0" y="0">315</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet316">
+      <rect id="Space316" class="st10" x="1113.7" y="584.2" width="120.1" height="120"/>
+      <rect id="Door316" class="st12" x="1109.8" y="632.6" width="7.8" height="18.1"/>
+      <g id="Text316" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(1161.9 649.3)"><tspan x="0" y="0">316</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet317">
+      <rect id="Space317" class="st10" x="1113.7" y="704.2" width="120.1" height="180.6"/>
+      <rect id="DoorSecond317" class="st12" x="1109.9" y="719.7" width="7.8" height="18.1"/>
+      <g id="Text317" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st26" transform="translate(1153.5 801.5)"><tspan x="0" y="0">317</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet318">
+      <rect id="Space318" class="st10" x="1114.2" y="937.6" width="120.1" height="269.5"/>
+      <rect id="Door318" class="st12" x="1110.2" y="963.8" width="7.8" height="18"/>
+      <g id="Text318" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(1164.6 1077.2)"><tspan x="0" y="0">318</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet319">
+      <rect id="Space319" class="st10" x="1001.2" y="1014.5" width="113" height="192.6"/>
+      <rect id="Door319" class="st12" x="1085.8" y="1010.6" width="18.1" height="7.8"/>
+      <g id="Text319" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st26" transform="translate(1040.3 1111.4)"><tspan x="0" y="0">319</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet320">
+      <rect id="Space320" class="st10" x="1003" y="538.6" width="74.1" height="128.9"/>
+      <rect id="Door320" class="st12" x="1073.2" y="584.2" width="7.8" height="16.5"/>
+      <g id="Text320" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_20" class="st17">
+              <g class="st17">
+                <text class="st23" transform="translate(1023.5 611.7) scale(1.1 1)"><tspan x="0" y="0">320</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinetServer">
+      <rect id="SpaceServer" class="st10" x="1003" y="447.5" width="74.1" height="91.1"/>
+      <rect id="DoorServer" class="st12" x="1073.2" y="501.9" width="7.8" height="16.5"/>
+      <g id="TextServer" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="Server" class="st17">
+              <g class="st17">
+                <text class="st14" transform="translate(1008.9 502.2) scale(1.1 1)"><tspan x="0" y="0">Серверная</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="AllowedLines">
+      <line id="itemQ57" class="st29" x1="1094.8" y1="931.6" x2="1094.8" y2="969.6"/>
+      <line id="itemQ56" class="st29" x1="1111.5" y1="908.8" x2="1095.2" y2="908.8"/>
+      <line id="itemQ55" class="st29" x1="1094.8" y1="870.8" x2="1094.8" y2="934.8"/>
+      <line id="itemQ53" class="st29" x1="1094.8" y1="809.1" x2="1094.8" y2="870.8"/>
+      <line id="itemQ52" class="st29" x1="1094.8" y1="809.1" x2="1042.8" y2="809.1"/>
+      <line id="itemQ51" class="st29" x1="1094.8" y1="783.7" x2="1094.8" y2="809.6"/>
+      <line id="itemQ50" class="st29" x1="1110.6" y1="728.7" x2="1094.8" y2="728.7"/>
+      <line id="itemQ49" class="st29" x1="1042.8" y1="915.9" x2="1042.8" y2="809.6"/>
+      <line id="itemQ48" class="st29" x1="1042.8" y1="809.6" x2="1042.8" y2="764.2"/>
+      <line id="itemQ47" class="st29" x1="1094.8" y1="735" x2="1094.8" y2="784.3"/>
+      <line id="itemQ46" class="st29" x1="1110.6" y1="641.6" x2="1094.8" y2="641.6"/>
+      <line id="itemQ45" class="st29" x1="1094.8" y1="584.5" x2="1094.8" y2="735.6"/>
+      <line id="itemQ44" class="st29" x1="1096.3" y1="592.4" x2="1080.4" y2="592.4"/>
+      <line id="itemQ43" class="st29" x1="1094.8" y1="543.8" x2="1094.8" y2="584.5"/>
+      <line id="itemQ42" class="st29" x1="1110.6" y1="510.2" x2="1094.8" y2="510.2"/>
+      <line id="itemQ41" class="st29" x1="1094.8" y1="496.5" x2="1094.8" y2="543.8"/>
+      <line id="itemQ40" class="st29" x1="1097.2" y1="510.2" x2="1079.5" y2="510.2"/>
+      <line id="itemQ39" class="st29" x1="1094.8" y1="453.2" x2="1094.8" y2="498.8"/>
+      <line id="itemQ38" class="st29" x1="1110.6" y1="293.1" x2="1094.8" y2="293.1"/>
+      <line id="itemQ37" class="st29" x1="1094.8" y1="293.1" x2="1094.8" y2="453.2"/>
+      <line id="itemQ36" class="st29" x1="1110.7" y1="253.8" x2="1094.8" y2="253.8"/>
+      <line id="itemQ35" class="st29" x1="1094.8" y1="203.9" x2="1094.8" y2="293.1"/>
+      <line id="itemQ33" class="st29" x1="1094.8" y1="141.6" x2="1094.8" y2="205.1"/>
+      <line id="itemQ32" class="st29" x1="1097.2" y1="141.6" x2="1034.1" y2="141.6"/>
+      <line id="itemQ31" class="st29" x1="1094.1" y1="139.8" x2="1094.1" y2="123.2"/>
+      <line id="itemQ30" class="st29" x1="1034.1" y1="141.6" x2="896.6" y2="141.6"/>
+      <line id="itemQ29" class="st29" x1="947.3" y1="160.6" x2="947.3" y2="141.6"/>
+      <line id="itemQ28" class="st29" x1="897.5" y1="141.6" x2="821.1" y2="141.6"/>
+      <line id="itemQ27" class="st29" x1="821.1" y1="141.6" x2="792.9" y2="141.6"/>
+      <line id="itemQ26" class="st29" x1="833.4" y1="140.4" x2="833.4" y2="123.4"/>
+      <line id="itemQ25" class="st29" x1="855.6" y1="161.6" x2="855.6" y2="142.6"/>
+      <line id="itemQ24" class="st29" x1="792.9" y1="141.6" x2="767.2" y2="141.6"/>
+      <line id="itemQ23" class="st29" x1="733.5" y1="160.4" x2="733.5" y2="143.8"/>
+      <line id="itemQ22" class="st29" x1="767.2" y1="141.6" x2="655.4" y2="141.6"/>
+      <line id="itemQ20" class="st29" x1="655.3" y1="141.6" x2="603.3" y2="141.6"/>
+      <line id="itemQ19" class="st29" x1="603.3" y1="141.6" x2="545.6" y2="141.6"/>
+      <line id="itemQ18" class="st29" x1="663.5" y1="140.2" x2="663.5" y2="123.6"/>
+      <line id="itemQ16" class="st29" x1="545.6" y1="141.6" x2="436.4" y2="141.6"/>
+      <line id="itemQ15" class="st29" x1="319.6" y1="139.2" x2="319.6" y2="122.5"/>
+      <line id="itemQ14" class="st29" x1="491" y1="141.2" x2="491" y2="122.5"/>
+      <line id="itemQ13" class="st29" x1="436.4" y1="141.6" x2="359.6" y2="141.6"/>
+      <line id="itemQ12" class="st29" x1="359.6" y1="193.3" x2="359.6" y2="141.6"/>
+      <line id="itemQ11" class="st29" x1="361.6" y1="190.8" x2="300.2" y2="190.8"/>
+      <line id="itemQ10" class="st29" x1="359.6" y1="141.6" x2="213.6" y2="141.6"/>
+      <line id="itemQ8" class="st29" x1="214" y1="141.6" x2="158.5" y2="141.6"/>
+      <line id="itemQ7" class="st29" x1="158.5" y1="175.6" x2="158.5" y2="141.6"/>
+      <line id="itemQ6" class="st29" x1="158" y1="184.5" x2="130.8" y2="184.5"/>
+      <line id="itemQ5" class="st29" x1="147.8" y1="143" x2="147.8" y2="122.5"/>
+      <line id="itemQ2" class="st29" x1="158.5" y1="211.4" x2="158.5" y2="175.6"/>
+      <line id="itemQ1" class="st29" x1="158.5" y1="213.4" x2="131.3" y2="213.4"/>
+      <line id="itemQ61" class="st29" x1="159.3" y1="141.6" x2="130.8" y2="141.6"/>
+      <line id="itemQ111" class="st29" x1="408" y1="190.8" x2="359.6" y2="190.8"/>
+      <line id="itemQ311" class="st29" x1="986.8" y1="140.2" x2="986.8" y2="121.3"/>
+      <line id="itemQ561" class="st29" x1="1109.6" y1="972.8" x2="1093.3" y2="972.8"/>
+      <line id="itemQ571" class="st29" x1="1094.8" y1="969.6" x2="1094.8" y2="1010.6"/>
+    </g>
+    <g id="Intersection">
+      <circle id="Intersection4" class="st27" cx="1094.8" cy="972.8" r="4.5"/>
+      <circle id="Intersection6" class="st27" cx="1094.8" cy="908.8" r="4.5"/>
+      <circle id="Intersection8" class="st27" cx="1094.1" cy="808.8" r="4.5"/>
+      <circle id="Intersection9" class="st27" cx="1042" cy="808.8" r="4.5"/>
+      <circle id="Intersection10" class="st27" cx="1094.8" cy="728.7" r="4.5"/>
+      <circle id="Intersection11" class="st27" cx="1094.8" cy="641.3" r="4.5"/>
+      <circle id="Intersection12" class="st27" cx="1095.6" cy="592.1" r="4.5"/>
+      <circle id="Intersection13" class="st27" cx="1094.8" cy="510.2" r="4.5"/>
+      <circle id="Intersection15" class="st27" cx="1094.2" cy="292.7" r="4.5"/>
+      <circle id="Intersection16" class="st27" cx="1094.1" cy="253.8" r="4.5"/>
+      <circle id="Intersection18" class="st27" cx="1094.1" cy="141.3" r="4.5"/>
+      <circle id="Intersection19" class="st27" cx="986.7" cy="140.8" r="4.5"/>
+      <circle id="Intersection20" class="st27" cx="947.3" cy="141.3" r="4.5"/>
+      <circle id="Intersection21" class="st27" cx="833.5" cy="141.3" r="4.5"/>
+      <circle id="Intersection22" class="st27" cx="855.6" cy="141.6" r="4.5"/>
+      <circle id="Intersection23" class="st27" cx="733.5" cy="141.6" r="4.5"/>
+      <circle id="Intersection25" class="st27" cx="663.5" cy="140.4" r="4.5"/>
+      <circle id="Intersection27" class="st27" cx="319.6" cy="141.2" r="4.5"/>
+      <circle id="Intersection28" class="st27" cx="360" cy="142.1" r="4.5"/>
+      <circle id="Intersection29" class="st27" cx="358.9" cy="190.5" r="4.5"/>
+      <circle id="Intersection31" class="st27" cx="157.8" cy="184" r="4.5"/>
+      <circle id="Intersection33" class="st27" cx="158" cy="212.1" r="4.5"/>
+      <circle id="Intersection311" class="st27" cx="147.8" cy="141.2" r="4.5"/>
+      <circle id="Intersection271" class="st27" cx="490.9" cy="139.2" r="4.5"/>
+      <circle id="Intersection312" class="st27" cx="158.5" cy="142" r="4.5"/>
+    </g>
+    <g id="ObjectCabinet300">
+      <rect id="Space300" class="st10" y="120.5" width="127.6" height="48.1"/>
+      <rect id="Door300" class="st12" x="123.5" y="134.1" width="7.8" height="15"/>
+      <g id="Text300" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(52.1 151.1)"><tspan x="0" y="0">300</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet305">
+      <rect id="Space305" class="st10" x="682.1" y="-2.5" width="170" height="121.4"/>
+      <rect id="Door305" class="st12" x="825.1" y="115.5" width="16.6" height="7.8"/>
+      <g id="Text305" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_05" class="st17">
+              <g class="st17">
+                <text class="st20" transform="translate(755.2 65) scale(.9 1)"><tspan x="0" y="0">305</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet306">
+      <rect id="Space306" class="st10" x="852.1" y="-.7" width="151.3" height="119.9"/>
+      <rect id="Door306" class="st12" x="979.4" y="113.6" width="14.8" height="7.7"/>
+      <g id="Text306" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_06" class="st17">
+              <g class="st17">
+                <text class="st21" transform="translate(917.1 63.8) scale(.8 1)"><tspan x="0" y="0">306</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectCabinet309a1">
+      <rect id="Space309a1" class="st10" x="525.8" y="164.6" width="258.1" height="62.5"/>
+      <rect id="Door309a1" class="st12" x="724.5" y="160.7" width="18" height="7.8"/>
+      <g id="Text309a1" class="st17">
+        <g class="st17">
+          <g class="st17">
+            <g id="_x33_09a1" class="st17">
+              <g class="st17">
+                <text class="st22" transform="translate(638.6 201.2)"><tspan x="0" y="0">309a</tspan></text>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="ObjectStairsSecond1">
+      <rect id="SpaceStairsThird" class="st9" x="1004.3" y="919.7" width="66.4" height="92.1"/>
+      <g id="StepsStairsThird2">
+        <rect id="_Ступенька111" data-name="_Ступенька11" class="st0" x="1005.2" y="986.9" width="32.5" height="6"/>
+        <rect id="_Ступенька111" class="st0" x="1005.2" y="980.9" width="32.5" height="6"/>
+        <rect id="_Ступенька21" class="st5" x="1005.2" y="974.9" width="32.5" height="6"/>
+        <rect id="_Ступенька311" class="st5" x="1005.3" y="968.6" width="32.5" height="6"/>
+        <rect id="_Ступенька411" class="st4" x="1005.3" y="962.6" width="32.5" height="6"/>
+        <rect id="_Ступенька51" class="st4" x="1005.3" y="956.6" width="32.5" height="6"/>
+        <rect id="_Ступенька61" class="st3" x="1005.3" y="950.6" width="32.5" height="6"/>
+        <rect id="_Ступенька71" class="st8" x="1005.3" y="944.6" width="32.5" height="6"/>
+        <rect id="_Ступенька81" class="st12" x="1005.3" y="938.6" width="32.5" height="6"/>
+      </g>
+      <g id="StepsStairsThird1">
+        <rect id="_Ступенька91" class="st7" x="1037.7" y="987" width="32.5" height="6"/>
+        <rect id="_Ступенька101" class="st7" x="1037.7" y="981" width="32.5" height="6"/>
+        <rect id="_Ступенька1111" data-name="_Ступенька111" class="st1" x="1037.7" y="975" width="32.5" height="6"/>
+        <rect id="_Ступенька121" class="st1" x="1037.7" y="968.6" width="32.5" height="6"/>
+        <rect id="_Ступенька131" class="st13" x="1037.7" y="962.6" width="32.5" height="6"/>
+        <rect id="_Ступенька141" class="st13" x="1037.7" y="956.6" width="32.5" height="6"/>
+        <rect id="_Ступенька151" class="st2" x="1037.7" y="950.6" width="32.5" height="6"/>
+        <rect id="_Ступенька161" class="st2" x="1037.7" y="944.6" width="32.5" height="6"/>
+        <rect id="_Ступенька171" class="st6" x="1037.7" y="938.6" width="32.5" height="6"/>
+      </g>
+      <rect id="DoorStairsThird" class="st12" x="1021.7" y="915.9" width="31.7" height="7.8"/>
+    </g>
+  </g>
+  <rect id="EmptySpace" class="st28" x="987.8" y="1207.1" width="308" height="264.6"/>
+</svg>
