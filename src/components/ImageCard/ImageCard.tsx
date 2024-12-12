@@ -60,13 +60,37 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
     e.preventDefault();
     if (!panning) return;
 
+    const image = imageRef.current;
+    if (!image) return;
+
     if (e.touches.length === 2) {
       // Pinch zoom
       const distance = getDistanceBetweenTouches(e.touches);
       if (lastDistance) {
+        // Вычисляем центр между двумя точками касания
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const centerX = (touch1.clientX + touch2.clientX) / 2;
+        const centerY = (touch1.clientY + touch2.clientY) / 2;
+
+        // Получаем позицию относительно изображения
+        const rect = image.getBoundingClientRect();
+        const mouseX = centerX - rect.left;
+        const mouseY = centerY - rect.top;
+
+        // Вычисляем новый масштаб
         const delta = (distance - lastDistance) * 0.01;
         const newScale = Math.min(Math.max(scale + delta, 1), 4);
+        
+        // Корректируем позицию относительно центра масштабирования
+        const scaleChange = newScale - scale;
+        const newPosition = {
+          x: position.x - (mouseX * scaleChange),
+          y: position.y - (mouseY * scaleChange)
+        };
+
         setScale(newScale);
+        setPosition(newPosition);
       }
       setLastDistance(distance);
     } else if (e.touches.length === 1) {

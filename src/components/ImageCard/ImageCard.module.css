@@ -4,6 +4,11 @@
   position: relative;
   overflow: hidden;
   background: #f0f0f0;
+  touch-action: none; /* Предотвращает стандартные touch действия браузера */
+  -webkit-overflow-scrolling: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .image {
@@ -12,6 +17,9 @@
   object-fit: contain;
   transform-origin: 0 0;
   cursor: grab;
+  touch-action: none;
+  -webkit-user-drag: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .image:active {
