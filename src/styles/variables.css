@@ -1,0 +1,10 @@
+:root {
+  --primary-color: #007BFF;
+  --secondary-color: #4B4B4B;
+  --background-color: #F5F5F5;
+  --text-color: #333333;
+  --active-color: #0056b3;
+  --hover-color: #0069d9;
+  --button-bg: #E9ECEF;
+  --dropdown-bg: #FFFFFF;
+} 
