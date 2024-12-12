@@ -4,19 +4,22 @@ import Dropdown from '../../components/DropDown/DropDown';
 import ImageCard from '../../components/ImageCard/ImageCard';
 import Button from '../../components/Button/Button';
 import { api } from '../../services/api';
+import TransitionEffect from '../../components/TransitionEffect/TransitionEffect';
 
 const HomePage: React.FC = () => {
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
-  const [currentFloor, setCurrentFloor] = useState('2');
+  const [currentFloor, setCurrentFloor] = useState('Floor_Second');
   const [route, setRoute] = useState<string | null>(null);
   const [offices, setOffices] = useState<string[]>([]);
+  const [floorImage, setFloorImage] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const floorToPath = {
-    '4': '/floors/4_этаж_шкн.svg',
-    '3': '/floors/3_этаж_шкн.svg',
-    '2': '/floors/2_этаж_шкн.svg',
-    '1': '/floors/1_этаж_шкн.svg',
+  const floors = {
+    'Floor_Fourth': '4',
+    'Floor_Third': '3',
+    'Floor_Second': '2',
+    'Floor_First': '1',
   };
 
   useEffect(() => {
@@ -69,6 +72,37 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const handleFloorChange = async (floor: string) => {
+    if (floor === currentFloor) return;
+    
+    setIsTransitioning(true);
+    
+    try {
+      const blob = await api.getFloorPlan(floor);
+      const url = URL.createObjectURL(blob);
+      
+      if (floorImage) {
+        URL.revokeObjectURL(floorImage);
+      }
+      
+      setFloorImage(url);
+      setCurrentFloor(floor);
+    } catch (error) {
+      console.error('Failed to fetch floor plan:', error);
+    }
+  };
+
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
+  };
+
+  // Очистка URL при размонтировании
+  useEffect(() => {
+    return () => {
+      if (floorImage) URL.revokeObjectURL(floorImage);
+    };
+  }, [floorImage]);
+
   return (
     <div className={styles.container}>
       <div className={styles.navigationPanel}>
@@ -95,19 +129,24 @@ const HomePage: React.FC = () => {
       </div>
       <div className={styles.content}>
         <div className={styles.buttonContainer}>
-          {Object.keys(floorToPath).reverse().map((text) => (
+          {Object.entries(floors).reverse().map(([apiFloor, displayText]) => (
             <Button 
-              key={text} 
-              text={text} 
-              isActive={currentFloor === text} 
-              onClick={() => setCurrentFloor(text)}
+              key={apiFloor}
+              text={displayText}
+              isActive={currentFloor === apiFloor}
+              onClick={() => handleFloorChange(apiFloor)}
             />
           ))}
         </div>
-        <ImageCard
-          src={floorToPath[currentFloor as keyof typeof floorToPath]}
-          alt="Map Image"
-        />
+        {floorImage && (
+          <ImageCard
+            src={floorImage}
+            alt="Floor Plan"
+          />
+        )}
+        {isTransitioning && (
+          <TransitionEffect onAnimationComplete={handleTransitionComplete} />
+        )}
       </div>
     </div>
   );

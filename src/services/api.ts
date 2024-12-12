@@ -6,8 +6,8 @@ export interface RouteResponse {
 }
 
 export const api = {
-  async getFloorPlan(): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/floor-plan`);
+  async getFloorPlan(floor: string): Promise<Blob> {
+    const response = await fetch(`${API_BASE_URL}/floor-plan/${floor}`);
     if (!response.ok) throw new Error("Failed to fetch floor plan");
     return response.blob();
   },
