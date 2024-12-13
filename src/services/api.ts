@@ -1,32 +1,36 @@
+import { cacheService } from "./cacheService";
+
 const API_BASE_URL = "http://localhost:8000";
 
-export interface RouteResponse {
-  path: string[];
-  distance: number;
+export interface LocationsMap {
+  [key: string]: string;
 }
 
 export const api = {
-  async getFloorPlan(floor: string): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/floor-plan/${floor}`);
+  async getFloorPlan(
+    floor: string,
+    officeAId?: string,
+    officeBId?: string
+  ): Promise<Blob> {
+    let url = `${API_BASE_URL}/floor-plan?floor=${floor}`;
+
+    if (officeAId && officeBId) {
+      url += `&office_a_id=${officeAId}&office_b_id=${officeBId}&top_k=1`;
+    }
+
+    const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch floor plan");
+
     return response.blob();
   },
 
-  async getObjects(): Promise<string[]> {
+  async getObjects(): Promise<LocationsMap> {
+    const cacheKey = "objects";
     const response = await fetch(`${API_BASE_URL}/objects`);
     if (!response.ok) throw new Error("Failed to fetch objects");
-    return response.json();
-  },
 
-  async findRoute(
-    officeAId: string,
-    officeBId: string,
-    topK: number = 3
-  ): Promise<RouteResponse[]> {
-    const response = await fetch(
-      `${API_BASE_URL}/route?office_a_id=${officeAId}&office_b_id=${officeBId}&top_k=${topK}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch route");
-    return response.json();
+    const data = await response.json();
+    cacheService.set(cacheKey, data);
+    return data;
   },
 };

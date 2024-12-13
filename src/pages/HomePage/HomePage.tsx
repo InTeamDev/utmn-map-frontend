@@ -9,9 +9,9 @@ import TransitionEffect from '../../components/TransitionEffect/TransitionEffect
 const HomePage: React.FC = () => {
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
-  const [currentFloor, setCurrentFloor] = useState('Floor_Second');
+  const [currentFloor, setCurrentFloor] = useState('Floor_First');
   const [route, setRoute] = useState<string | null>(null);
-  const [offices, setOffices] = useState<string[]>([]);
+  const [locations, setLocations] = useState<{ [key: string]: string }>({});
   const [floorImage, setFloorImage] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -23,54 +23,95 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchOffices = async () => {
+    const initializeData = async () => {
       try {
-        const objects = await api.getObjects();
-        const processedOffices = objects
-          .map(obj => {
-            const match = obj.match(/Floor_(\w+)_Office_(\w+)/);
-            if (!match) return null;
-            
-            const [_, floor, room] = match;
-            
-            // Skip IDK rooms
-            if (room.startsWith('IDK')) return null;
-            
-            // Process special cases
-            if (room.startsWith('Toilet')) {
-              return `Туалет (${floor} этаж)`;
-            }
-            if (room.startsWith('Kitchen')) {
-              return 'Столовая';
-            }
-            
-            return room;
-          })
-          .filter((office): office is string => office !== null)
-          .sort((a, b) => {
-            // Convert to numbers for numerical sorting if possible
-            const numA = parseInt(a);
-            const numB = parseInt(b);
-            if (!isNaN(numA) && !isNaN(numB)) {
-              return numA - numB;
-            }
-            return a.localeCompare(b);
-          });
+        // Загружаем план первого этажа
+        const blob = await api.getFloorPlan('Floor_First');
+        const url = URL.createObjectURL(blob);
+        setFloorImage(url);
 
-        setOffices(processedOffices);
+        // Загружаем список локаций
+        const locationsData = await api.getObjects();
+        setLocations(locationsData);
       } catch (error) {
-        console.error('Failed to fetch offices:', error);
+        console.error('Failed to initialize data:', error);
       }
     };
 
-    fetchOffices();
+    initializeData();
   }, []);
 
-  const handleRouteCalculation = () => {
-    if (from && to) {
-      setRoute(`Маршрут от ${from} до ${to}`);
-    }
+  const getLocationOptions = () => {
+    return Object.entries(locations)
+      .filter(([key]) => {
+        return !key.includes('IDK') && !key.includes('Stairs');
+      })
+      .map(([key, value]) => {
+        const floor = key.split('_')[1];
+        
+        // Заменяем специальные названия
+        let label = value
+          .replace(/Toilet[^(]*/g, 'Туалет') // Заменяем Toilet и всё после него до скобок на "Туалет"
+          .replace('Gym', 'Спортзал')
+          .replace('Kitchen', 'Кухня')
+          .replace('Dining', 'Столовая')
+          .replace('Wardrobe', 'Гардероб')
+          .replace('First', '1')
+          .replace('Second', '2')
+          .replace('Third', '3')
+          .replace('Fourth', '4');
+
+        return {
+          value: key,
+          label,
+          floor: parseInt(floor === 'First' ? '1' : 
+                         floor === 'Second' ? '2' : 
+                         floor === 'Third' ? '3' : '4')
+        };
+      })
+      .sort((a, b) => {
+        if (a.floor !== b.floor) {
+          return a.floor - b.floor;
+        }
+        
+        const numA = parseInt(a.label.match(/\d+/)?.[0] || '');
+        const numB = parseInt(b.label.match(/\d+/)?.[0] || '');
+        
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return numA - numB;
+        }
+        
+        return a.label.localeCompare(b.label);
+      });
   };
+
+  useEffect(() => {
+    const updateRoute = async () => {
+      try {
+        const blob = await api.getFloorPlan(
+          currentFloor, 
+          from || undefined, 
+          to || undefined
+        );
+        const url = URL.createObjectURL(blob);
+        
+        if (floorImage) {
+          URL.revokeObjectURL(floorImage);
+        }
+        
+        setFloorImage(url);
+        if (from && to) {
+          setRoute(`Маршрут от ${locations[from]} до ${locations[to]}`);
+        } else {
+          setRoute(null);
+        }
+      } catch (error) {
+        console.error('Failed to update route:', error);
+      }
+    };
+
+    updateRoute();
+  }, [from, to, currentFloor, locations]);
 
   const handleFloorChange = async (floor: string) => {
     if (floor === currentFloor) return;
@@ -78,7 +119,11 @@ const HomePage: React.FC = () => {
     setIsTransitioning(true);
     
     try {
-      const blob = await api.getFloorPlan(floor);
+      const blob = await api.getFloorPlan(
+        floor, 
+        from || undefined, 
+        to || undefined
+      );
       const url = URL.createObjectURL(blob);
       
       if (floorImage) {
@@ -89,6 +134,8 @@ const HomePage: React.FC = () => {
       setCurrentFloor(floor);
     } catch (error) {
       console.error('Failed to fetch floor plan:', error);
+    } finally {
+      setIsTransitioning(false);
     }
   };
 
@@ -108,22 +155,15 @@ const HomePage: React.FC = () => {
       <div className={styles.navigationPanel}>
         <div className={styles.dropdownContainer}>
           <Dropdown
-            options={offices}
+            options={getLocationOptions()}
             placeholder="Откуда?"
             onChange={(val) => setFrom(val)}
           />
           <Dropdown
-            options={offices}
+            options={getLocationOptions()}
             placeholder="Куда?"
             onChange={(val) => setTo(val)}
           />
-          <button 
-            className={styles.findRouteButton}
-            onClick={handleRouteCalculation}
-            disabled={!from || !to}
-          >
-            Найти маршрут
-          </button>
         </div>
         {route && <div className={styles.routeInfo}>{route}</div>}
       </div>

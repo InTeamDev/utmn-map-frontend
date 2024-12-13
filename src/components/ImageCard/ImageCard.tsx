@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import styles from './ImageCard.module.css';
+import React, { useState, useRef, useEffect, useCallback, memo } from "react";
+import styles from "./ImageCard.module.css";
 
 interface ImageCardProps {
   src: string;
@@ -13,142 +13,112 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
   const [lastDistance, setLastDistance] = useState<number | null>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const frameRef = useRef<number>();
+  const positionRef = useRef(position);
+  const scaleRef = useRef(scale);
 
-  // Обработчик для колесика мыши (десктоп)
-  const handleWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    
-    const image = imageRef.current;
-    if (!image) return;
+  // Обновляем refs при изменении состояния
+  useEffect(() => {
+    positionRef.current = position;
+    scaleRef.current = scale;
+  }, [position, scale]);
 
-    const rect = image.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const delta = e.deltaY * -0.01;
-    const newScale = Math.min(Math.max(scale + delta, 1), 4);
-    
-    const scaleChange = newScale - scale;
-    const newPosition = {
-      x: position.x - (mouseX * scaleChange),
-      y: position.y - (mouseY * scaleChange)
-    };
-
-    setScale(newScale);
-    setPosition(newPosition);
-  };
-
-  // Обработчик для touch событий (мобильные устройства)
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
-    setPanning(true);
-
-    if (e.touches.length === 2) {
-      // Pinch zoom
-      const distance = getDistanceBetweenTouches(e.touches);
-      setLastDistance(distance);
-    } else if (e.touches.length === 1) {
-      // Pan
-      setStartPoint({
-        x: e.touches[0].clientX - position.x,
-        y: e.touches[0].clientY - position.y
-      });
+  const updateTransform = useCallback(() => {
+    if (imageRef.current) {
+      imageRef.current.style.transform = `translate(${positionRef.current.x}px, ${positionRef.current.y}px) scale(${scaleRef.current})`;
     }
-  };
+  }, []);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    if (!panning) return;
+  const scheduleUpdate = useCallback(
+    (newPosition?: { x: number; y: number }, newScale?: number) => {
+      if (newPosition) positionRef.current = newPosition;
+      if (newScale !== undefined) scaleRef.current = newScale;
 
-    const image = imageRef.current;
-    if (!image) return;
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      frameRef.current = requestAnimationFrame(() => {
+        updateTransform();
+        setPosition(positionRef.current);
+        if (newScale !== undefined) setScale(newScale);
+      });
+    },
+    [updateTransform],
+  );
 
-    if (e.touches.length === 2) {
-      // Pinch zoom
-      const distance = getDistanceBetweenTouches(e.touches);
-      if (lastDistance) {
-        // Вычисляем центр между двумя точками касания
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        const centerX = (touch1.clientX + touch2.clientX) / 2;
-        const centerY = (touch1.clientY + touch2.clientY) / 2;
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault();
 
-        // Получаем позицию относительно изображения
-        const rect = image.getBoundingClientRect();
-        const mouseX = centerX - rect.left;
-        const mouseY = centerY - rect.top;
+      const image = imageRef.current;
+      if (!image) return;
 
-        // Вычисляем новый масштаб
+      const rect = image.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const delta = e.deltaY * -0.01;
+      const newScale = Math.min(Math.max(scaleRef.current + delta, 1), 4);
+
+      const scaleChange = newScale - scaleRef.current;
+      const newPosition = {
+        x: positionRef.current.x - mouseX * scaleChange,
+        y: positionRef.current.y - mouseY * scaleChange,
+      };
+
+      scheduleUpdate(newPosition, newScale);
+    },
+    [scheduleUpdate],
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!panning) return;
+
+      const newPosition = {
+        x: e.clientX - startPoint.x,
+        y: e.clientY - startPoint.y,
+      };
+
+      scheduleUpdate(newPosition);
+    },
+    [panning, startPoint, scheduleUpdate],
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      if (!panning) return;
+
+      if (e.touches.length === 2 && lastDistance !== null) {
+        const distance = Math.hypot(
+          e.touches[1].clientX - e.touches[0].clientX,
+          e.touches[1].clientY - e.touches[0].clientY,
+        );
+
         const delta = (distance - lastDistance) * 0.01;
-        const newScale = Math.min(Math.max(scale + delta, 1), 4);
-        
-        // Корректируем позицию относительно центра масштабирования
-        const scaleChange = newScale - scale;
-        const newPosition = {
-          x: position.x - (mouseX * scaleChange),
-          y: position.y - (mouseY * scaleChange)
-        };
+        const newScale = Math.min(Math.max(scaleRef.current + delta, 1), 4);
 
-        setScale(newScale);
-        setPosition(newPosition);
+        scheduleUpdate(undefined, newScale);
+        setLastDistance(distance);
+      } else if (e.touches.length === 1) {
+        scheduleUpdate({
+          x: e.touches[0].clientX - startPoint.x,
+          y: e.touches[0].clientY - startPoint.y,
+        });
       }
-      setLastDistance(distance);
-    } else if (e.touches.length === 1) {
-      // Pan
-      setPosition({
-        x: e.touches[0].clientX - startPoint.x,
-        y: e.touches[0].clientY - startPoint.y
-      });
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setPanning(false);
-    setLastDistance(null);
-  };
-
-  // Вспомогательная функция для вычисления расстояния между точками касания
-  const getDistanceBetweenTouches = (touches: React.TouchList) => {
-    const touch1 = touches[0];
-    const touch2 = touches[1];
-    return Math.hypot(
-      touch2.clientX - touch1.clientX,
-      touch2.clientY - touch1.clientY
-    );
-  };
-
-  // Обработчики для мыши (десктоп)
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setPanning(true);
-    setStartPoint({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!panning) return;
-
-    setPosition({
-      x: e.clientX - startPoint.x,
-      y: e.clientY - startPoint.y
-    });
-  };
-
-  const handleMouseUp = () => {
-    setPanning(false);
-  };
+    },
+    [panning, lastDistance, startPoint, scheduleUpdate],
+  );
 
   useEffect(() => {
     const image = imageRef.current;
     if (!image) return;
 
-    image.addEventListener('wheel', handleWheel, { passive: false });
+    image.addEventListener("wheel", handleWheel, { passive: false });
     return () => {
-      image.removeEventListener('wheel', handleWheel);
+      image.removeEventListener("wheel", handleWheel);
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
     };
-  }, [scale, position]);
+  }, [handleWheel]);
 
   return (
     <div className={styles.imageWrapper}>
@@ -158,18 +128,45 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
         src={src}
         alt={alt}
         style={{
+          willChange: "transform",
           transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
         }}
-        onMouseDown={handleMouseDown}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          setPanning(true);
+          setStartPoint({
+            x: e.clientX - positionRef.current.x,
+            y: e.clientY - positionRef.current.y,
+          });
+        }}
         onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
+        onMouseUp={() => setPanning(false)}
+        onMouseLeave={() => setPanning(false)}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          setPanning(true);
+          if (e.touches.length === 2) {
+            setLastDistance(
+              Math.hypot(
+                e.touches[1].clientX - e.touches[0].clientX,
+                e.touches[1].clientY - e.touches[0].clientY,
+              ),
+            );
+          } else if (e.touches.length === 1) {
+            setStartPoint({
+              x: e.touches[0].clientX - positionRef.current.x,
+              y: e.touches[0].clientY - positionRef.current.y,
+            });
+          }
+        }}
         onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchEnd={() => {
+          setPanning(false);
+          setLastDistance(null);
+        }}
       />
     </div>
   );
 };
 
-export default ImageCard;
+export default memo(ImageCard);
