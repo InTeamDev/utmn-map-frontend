@@ -22,41 +22,71 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
     scaleRef.current = scale;
   }, [position, scale]);
 
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      e.preventDefault();
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    setPanning(true);
+    setStartPoint({
+      x: touch.clientX - positionRef.current.x,
+      y: touch.clientY - positionRef.current.y,
+    });
+  };
 
-      const wrapper = wrapperRef.current;
-      const image = imageRef.current;
-      if (!wrapper || !image) return;
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!panning) return;
+    const touch = e.touches[0];
+    const newPosition = {
+      x: touch.clientX - startPoint.x,
+      y: touch.clientY - startPoint.y,
+    };
 
-      const wrapperRect = wrapper.getBoundingClientRect();
-      const mouseX = e.clientX - wrapperRect.left;
-      const mouseY = e.clientY - wrapperRect.top;
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    frameRef.current = requestAnimationFrame(() => {
+      if (imageRef.current) {
+        imageRef.current.style.transform = `translate(${newPosition.x}px, ${newPosition.y}px) scale(${scaleRef.current})`;
+      }
+      setPosition(newPosition);
+      positionRef.current = newPosition;
+    });
+  };
 
-      const relativeX = (mouseX - positionRef.current.x) / scaleRef.current;
-      const relativeY = (mouseY - positionRef.current.y) / scaleRef.current;
+  const handleTouchEnd = () => {
+    setPanning(false);
+  };
 
-      const delta = e.deltaY * -0.01;
-      const newScale = Math.min(Math.max(scaleRef.current + delta, 1), 4);
+  const handleWheel = useCallback((e: WheelEvent) => {
+    e.preventDefault();
 
-      const newPosition = {
-        x: mouseX - relativeX * newScale,
-        y: mouseY - relativeY * newScale,
-      };
+    const wrapper = wrapperRef.current;
+    const image = imageRef.current;
+    if (!wrapper || !image) return;
 
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      frameRef.current = requestAnimationFrame(() => {
-        image.style.transform = `translate(${newPosition.x}px, ${newPosition.y}px) scale(${newScale})`;
-        setPosition(newPosition);
-        setScale(newScale);
-        positionRef.current = newPosition;
-        scaleRef.current = newScale;
-      });
-    },
-    []
-  );
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const mouseX = e.clientX - wrapperRect.left;
+    const mouseY = e.clientY - wrapperRect.top;
 
+    const relativeX = (mouseX - positionRef.current.x) / scaleRef.current;
+    const relativeY = (mouseY - positionRef.current.y) / scaleRef.current;
+
+    const delta = e.deltaY * -0.01;
+    const newScale = Math.min(Math.max(scaleRef.current + delta, 1), 4);
+
+    const newPosition = {
+      x: mouseX - relativeX * newScale,
+      y: mouseY - relativeY * newScale,
+    };
+
+    // Прямо устанавливаем новое состояние
+    setPosition(newPosition);
+    setScale(newScale);
+    positionRef.current = newPosition;
+    scaleRef.current = newScale;
+
+    // Обновляем стиль изображения
+    if (imageRef.current) {
+      imageRef.current.style.transform = `translate(${newPosition.x}px, ${newPosition.y}px) scale(${newScale})`;
+    }
+  }, []);
   useEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
@@ -86,7 +116,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
         positionRef.current = newPosition;
       });
     },
-    [panning, startPoint]
+    [panning, startPoint],
   );
 
   return (
@@ -111,6 +141,9 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
         onMouseMove={handleMouseMove}
         onMouseUp={() => setPanning(false)}
         onMouseLeave={() => setPanning(false)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       />
     </div>
   );

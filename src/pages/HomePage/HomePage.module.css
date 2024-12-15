@@ -10,52 +10,35 @@
 }
 
 .dropdownContainer {
+  position: absolute; /* Позволяет задавать координаты относительно родителя */
+  top: 10px; /* Отступ от верхнего края */
+  left: 10px; /* Отступ от левого края */
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 400px;
+  flex-direction: column; /* Расположение Dropdown вертикально (если их несколько) */
+  gap: 8px; /* Расстояние между Dropdown */
+  z-index: 10; /* Располагает поверх карты */
 }
 
 .content {
-  display: flex;
-  gap: 16px;
   position: relative;
-  height: calc(100vh - 180px);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .buttonContainer {
+  position: absolute; /* Позволяет позиционировать относительно родителя */
+  top: 50%; /* Центрирование по вертикали */
+  right: 10px; /* Расположение на 10px от правого края */
+  transform: translateY(
+    -50%
+  ); /* Смещение вверх на половину высоты для идеального центрирования */
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  height: fit-content;
-}
-
-.findRouteButton {
-  height: 48px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.findRouteButton:disabled {
-  background-color: var(--button-bg);
-  cursor: not-allowed;
-}
-
-.routeInfo {
-  margin-top: 16px;
-  padding: 12px;
-  background: white;
-  border-radius: 8px;
-  border-left: 4px solid var(--primary-color);
+  flex-direction: column; /* Расположение кнопок вертикально */
+  gap: 8px; /* Расстояние между кнопками */
+  z-index: 10; /* Располагает поверх карты */
 }
 
 @media (max-width: 768px) {
@@ -65,7 +48,10 @@
 
   .navigationPanel,
   .dropdownContainer {
-    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 400px;
   }
 
   .content {
@@ -77,3 +63,4 @@
     padding: 4px;
   }
 }
+

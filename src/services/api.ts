@@ -11,7 +11,7 @@ export const api = {
   async getFloorPlan(
     floor: string,
     officeAId?: string,
-    officeBId?: string
+    officeBId?: string,
   ): Promise<Blob> {
     let url = `${API_BASE_URL}/floor-plan?floor=${floor}`;
 
