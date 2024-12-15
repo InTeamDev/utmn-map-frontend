@@ -4,16 +4,15 @@ import Dropdown from '../../components/DropDown/DropDown';
 import ImageCard from '../../components/ImageCard/ImageCard';
 import Button from '../../components/Button/Button';
 import { api } from '../../services/api';
-import TransitionEffect from '../../components/TransitionEffect/TransitionEffect';
+import Error from '../../components/Error/Error';
 
 const HomePage: React.FC = () => {
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
   const [currentFloor, setCurrentFloor] = useState('Floor_First');
-  const [route, setRoute] = useState<string | null>(null);
   const [locations, setLocations] = useState<{ [key: string]: string }>({});
   const [floorImage, setFloorImage] = useState<string | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const floors = {
     'Floor_Fourth': '4',
@@ -25,15 +24,14 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const initializeData = async () => {
       try {
-        // Загружаем план первого этажа
         const blob = await api.getFloorPlan('Floor_First');
         const url = URL.createObjectURL(blob);
         setFloorImage(url);
-
-        // Загружаем список локаций
         const locationsData = await api.getObjects();
         setLocations(locationsData);
+        setError(null);
       } catch (error) {
+        setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.');
         console.error('Failed to initialize data:', error);
       }
     };
@@ -100,12 +98,9 @@ const HomePage: React.FC = () => {
         }
         
         setFloorImage(url);
-        if (from && to) {
-          setRoute(`Маршрут от ${locations[from]} до ${locations[to]}`);
-        } else {
-          setRoute(null);
-        }
+        setError(null);
       } catch (error) {
+        setError('Не удалось обновить маршрут. Попробуйте еще раз.');
         console.error('Failed to update route:', error);
       }
     };
@@ -115,8 +110,6 @@ const HomePage: React.FC = () => {
 
   const handleFloorChange = async (floor: string) => {
     if (floor === currentFloor) return;
-    
-    setIsTransitioning(true);
     
     try {
       const blob = await api.getFloorPlan(
@@ -134,40 +127,55 @@ const HomePage: React.FC = () => {
       setCurrentFloor(floor);
     } catch (error) {
       console.error('Failed to fetch floor plan:', error);
-    } finally {
-      setIsTransitioning(false);
     }
   };
 
-  const handleTransitionComplete = () => {
-    setIsTransitioning(false);
+  const handleFromChange = (value: string | null) => {
+    if (!value) return;
+    setFrom(value);
+    const floor = value.split('_')[1];
+    const floorKey = `Floor_${floor}`;
+    if (floorKey !== currentFloor) {
+      handleFloorChange(floorKey);
+    }
   };
 
-  // Очистка URL при размонтировании
-  useEffect(() => {
-    return () => {
-      if (floorImage) URL.revokeObjectURL(floorImage);
-    };
-  }, [floorImage]);
+  const handleToChange = (value: string | null) => {
+    if (!value) return;
+    setTo(value);
+    if (from !== null) {
+      const floor = from.split('_')[1];
+      const floorKey = `Floor_${floor}`;
+      if (floorKey !== currentFloor) {
+        handleFloorChange(floorKey);
+      }
+    }
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.navigationPanel}>
+        {error && <Error message={error} />}
         <div className={styles.dropdownContainer}>
           <Dropdown
             options={getLocationOptions()}
             placeholder="Откуда?"
-            onChange={(val) => setFrom(val)}
+            onChange={handleFromChange}
           />
           <Dropdown
             options={getLocationOptions()}
             placeholder="Куда?"
-            onChange={(val) => setTo(val)}
+            onChange={handleToChange}
           />
         </div>
-        {route && <div className={styles.routeInfo}>{route}</div>}
       </div>
       <div className={styles.content}>
+        {floorImage && (
+          <ImageCard
+            src={floorImage}
+            alt="Floor Plan"
+          />
+        )}
         <div className={styles.buttonContainer}>
           {Object.entries(floors).reverse().map(([apiFloor, displayText]) => (
             <Button 
@@ -178,15 +186,6 @@ const HomePage: React.FC = () => {
             />
           ))}
         </div>
-        {floorImage && (
-          <ImageCard
-            src={floorImage}
-            alt="Floor Plan"
-          />
-        )}
-        {isTransitioning && (
-          <TransitionEffect onAnimationComplete={handleTransitionComplete} />
-        )}
       </div>
     </div>
   );

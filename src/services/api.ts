@@ -1,6 +1,7 @@
 import { cacheService } from "./cacheService";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 export interface LocationsMap {
   [key: string]: string;
@@ -15,7 +16,7 @@ export const api = {
     let url = `${API_BASE_URL}/floor-plan?floor=${floor}`;
 
     if (officeAId && officeBId) {
-      url += `&office_a_id=${officeAId}&office_b_id=${officeBId}&top_k=1`;
+      url += `&office_a_id=${officeAId}&office_b_id=${officeBId}&top_k=3`;
     }
 
     const response = await fetch(url);
