@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styles from './HomePage.module.css'
-import Dropdown from '../../components/DropDown/DropDown'
+import Dropdown, { DropdownOption } from '../../components/DropDown/DropDown'
 import ImageCard from '../../components/ImageCard/ImageCard'
 import Button from '../../components/Button/Button'
 import { api } from '../../services/api'
@@ -13,6 +13,7 @@ const HomePage: React.FC = () => {
   const [locations, setLocations] = useState<{ [key: string]: string }>({})
   const [floorImage, setFloorImage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [selectedBuilding, setSelectedBuilding] = useState('')
 
   const floors = {
     Floor_Fourth: '4',
@@ -20,6 +21,15 @@ const HomePage: React.FC = () => {
     Floor_Second: '2',
     Floor_First: '1',
   }
+
+  const buildings: { [key: string]: string } = {
+    'улк 5': 'Школа компьютерных наук',
+  }
+
+  const buildingOptions: DropdownOption[] = Object.keys(buildings).map((key) => ({
+    value: key,
+    label: buildings[key],
+  }))
 
   useEffect(() => {
     const initializeData = async () => {
@@ -32,7 +42,8 @@ const HomePage: React.FC = () => {
         setError(null)
       } catch (error) {
         setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
-        console.error('Failed to initialize data:', error)
+        // TODO: replace console
+        //console.error('Failed to initialize data:', error)
       }
     }
 
@@ -95,7 +106,7 @@ const HomePage: React.FC = () => {
         setError(null)
       } catch (error) {
         setError('Не удалось обновить маршрут. Попробуйте еще раз.')
-        console.error('Failed to update route:', error)
+        //console.error('Failed to update route:', error)
       }
     }
 
@@ -116,7 +127,7 @@ const HomePage: React.FC = () => {
       setFloorImage(url)
       setCurrentFloor(floor)
     } catch (error) {
-      console.error('Failed to fetch floor plan:', error)
+      // console.error('Failed to fetch floor plan:', error)
     }
   }
 
@@ -142,30 +153,43 @@ const HomePage: React.FC = () => {
     }
   }
 
+  const handleBuildignChange = (value: string | null) => {
+    if (!value) return
+    setSelectedBuilding(value)
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.navigationPanel}>
         {error && <Error message={error} />}
-        <div className={styles.dropdownContainer}>
-          <Dropdown options={getLocationOptions()} placeholder="Откуда?" onChange={handleFromChange} />
-          <Dropdown options={getLocationOptions()} placeholder="Куда?" onChange={handleToChange} />
+        {selectedBuilding && (
+          <div className={styles.dropdownContainer}>
+            <Dropdown options={getLocationOptions()} placeholder="Откуда?" onChange={handleFromChange} />
+            <Dropdown options={getLocationOptions()} placeholder="Куда?" onChange={handleToChange} />
+          </div>
+        )}
+        <div className={styles.buildingDropdownContainer}>
+          <Dropdown options={buildingOptions} placeholder="Выбрать корпус" onChange={handleBuildignChange} />
         </div>
       </div>
-      <div className={styles.content}>
-        {floorImage && <ImageCard src={floorImage} alt="Floor Plan" />}
-        <div className={styles.buttonContainer}>
-          {Object.entries(floors)
-            .reverse()
-            .map(([apiFloor, displayText]) => (
-              <Button
-                key={apiFloor}
-                text={displayText}
-                isActive={currentFloor === apiFloor}
-                onClick={() => handleFloorChange(apiFloor)}
-              />
-            ))}
+
+      {selectedBuilding && (
+        <div className={styles.content}>
+          {floorImage && <ImageCard src={floorImage} alt="Floor Plan" />}
+          <div className={styles.buttonContainer}>
+            {Object.entries(floors)
+              .reverse()
+              .map(([apiFloor, displayText]) => (
+                <Button
+                  key={apiFloor}
+                  text={displayText}
+                  isActive={currentFloor === apiFloor}
+                  onClick={() => handleFloorChange(apiFloor)}
+                />
+              ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -1,54 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from './DropDown.module.css';
+import React, { useState, useEffect, useRef } from 'react'
+import styles from './DropDown.module.css'
 
-interface DropdownOption {
-  value: string;
-  label: string;
+export interface DropdownOption {
+  value: string
+  label: string
 }
 
 interface DropdownProps {
-  options: DropdownOption[];
-  placeholder: string;
-  onChange: (value: string) => void;
+  options: DropdownOption[]
+  placeholder: string
+  onChange: (value: string) => void
 }
 
 const Dropdown: React.FC<DropdownProps> = ({ options, placeholder, onChange }) => {
-  const [inputValue, setInputValue] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [filteredOptions, setFilteredOptions] = useState(options);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [inputValue, setInputValue] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const [filteredOptions, setFilteredOptions] = useState(options)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setFilteredOptions(
-      options.filter(option =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      )
-    );
-  }, [inputValue, options]);
+    setFilteredOptions(options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase())))
+  }, [inputValue, options])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setIsOpen(true);
-  };
+    setInputValue(e.target.value)
+    setIsOpen(true)
+  }
 
   const handleOptionClick = (option: DropdownOption) => {
-    setInputValue(option.label);
-    onChange(option.value);
-    setIsOpen(false);
-  };
+    setInputValue(option.label)
+    onChange(option.value)
+    setIsOpen(false)
+  }
 
   return (
     <div className={styles.dropdownContainer} ref={dropdownRef}>
@@ -63,18 +59,14 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder, onChange }) =
       {isOpen && filteredOptions.length > 0 && (
         <div className={styles.optionsList}>
           {filteredOptions.map((option) => (
-            <div
-              key={option.value}
-              className={styles.option}
-              onClick={() => handleOptionClick(option)}
-            >
+            <div key={option.value} className={styles.option} onClick={() => handleOptionClick(option)}>
               {option.label}
             </div>
           ))}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Dropdown;
+export default Dropdown
