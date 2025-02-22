@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Запускать pipeline при пуше в ветку main
+  pull_request:
+    branches:
+      - main # Запускать pipeline при создании PR в ветку main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Укажите версию Node.js, которую используете
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test # Запускать деплой только после успешного завершения сборки и тестов
+    if: github.ref == 'refs/heads/main' # Деплой только для ветки main
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'cd /root/vkr/frontend && git pull origin main'
+          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'cd /root/vkr/frontend && npm install'
+          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'cd /root/vkr/frontend && npm run build'
+          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'sudo systemctl restart utmn-map--frontend'
