@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main # Запускать pipeline при пуше в ветку main
+      - main
   pull_request:
     branches:
-      - main # Запускать pipeline при создании PR в ветку main
+      - main
 
 jobs:
   build-and-test:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # Укажите версию Node.js, которую используете
+          node-version: 23
 
       - name: Install dependencies
         run: npm install
@@ -29,8 +29,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-test # Запускать деплой только после успешного завершения сборки и тестов
-    if: github.ref == 'refs/heads/main' # Деплой только для ветки main
+    needs: build
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
