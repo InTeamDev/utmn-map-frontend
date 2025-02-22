@@ -9,8 +9,27 @@ on:
       - main
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 23
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint src --max-warnings=1000 # Игнорируем предупреждения
+
   build-and-test:
     runs-on: ubuntu-latest
+    needs: lint # Запускать сборку только после проверки ESLint
 
     steps:
       - name: Checkout code
@@ -29,8 +48,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main'
+    needs: build-and-test # Запускать деплой только после успешной сборки
+    if: github.ref == 'refs/heads/main' # Деплой только для ветки main
 
     steps:
       - name: Checkout code

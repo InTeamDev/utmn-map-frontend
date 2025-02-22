@@ -125,7 +125,7 @@ const HomePage: React.FC = () => {
     };
 
     updateRoute();
-  }, [from, to, floorImage, currentFloor, locations]);
+  }, [from, to, currentFloor, locations]);
 
   const handleFloorChange = async (floor: string) => {
     if (floor === currentFloor) return;
