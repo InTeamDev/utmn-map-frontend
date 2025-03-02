@@ -45,7 +45,7 @@ const HomePage: React.FC = () => {
       } catch (error) {
         setError("Не удалось загрузить данные. Пожалуйста, обновите страницу.");
         // TODO: replace console
-        //console.error('Failed to initialize data:', error)
+        // console.error("Failed to initialize data:", error);
       }
     };
 

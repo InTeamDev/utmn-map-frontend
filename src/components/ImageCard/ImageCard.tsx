@@ -12,6 +12,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [startPoint, setStartPoint] = useState({ x: 0, y: 0 });
   const [initialDistance, setInitialDistance] = useState<number | null>(null);
+  const [initialScale, setInitialScale] = useState(1);
   const imageRef = useRef<HTMLImageElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number>();
@@ -25,7 +26,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
-      // Если два пальца, начинаем масштабирование
+      // Начало жеста масштабирования
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const distance = Math.hypot(
@@ -33,8 +34,9 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
         touch2.clientY - touch1.clientY,
       );
       setInitialDistance(distance);
+      setInitialScale(scaleRef.current); // Запоминаем текущий масштаб
     } else if (e.touches.length === 1) {
-      // Если один палец, начинаем перемещение
+      // Начало перемещения
       const touch = e.touches[0];
       setPanning(true);
       setStartPoint({
@@ -53,9 +55,39 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
         touch2.clientX - touch1.clientX,
         touch2.clientY - touch1.clientY,
       );
-      const newScale = (distance / initialDistance) * scaleRef.current;
-      setScale(newScale);
-      scaleRef.current = newScale;
+
+      // Вычисляем новый масштаб
+      const newScale = (distance / initialDistance) * initialScale;
+      const clampedScale = Math.min(Math.max(newScale, 1), 4); // Ограничиваем масштаб
+
+      // Вычисляем центр между двумя пальцами
+      const centerX = (touch1.clientX + touch2.clientX) / 2;
+      const centerY = (touch1.clientY + touch2.clientY) / 2;
+
+      // Корректируем позицию изображения относительно центра масштабирования
+      const wrapper = wrapperRef.current;
+      if (!wrapper) return;
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const relativeX =
+        (centerX - wrapperRect.left - positionRef.current.x) / scaleRef.current;
+      const relativeY =
+        (centerY - wrapperRect.top - positionRef.current.y) / scaleRef.current;
+
+      const newPosition = {
+        x: centerX - wrapperRect.left - relativeX * clampedScale,
+        y: centerY - wrapperRect.top - relativeY * clampedScale,
+      };
+
+      // Обновляем состояние
+      setScale(clampedScale);
+      setPosition(newPosition);
+      scaleRef.current = clampedScale;
+      positionRef.current = newPosition;
+
+      // Применяем трансформацию
+      if (imageRef.current) {
+        imageRef.current.style.transform = `translate(${newPosition.x}px, ${newPosition.y}px) scale(${clampedScale})`;
+      }
     } else if (e.touches.length === 1 && panning) {
       // Перемещение
       const touch = e.touches[0];
