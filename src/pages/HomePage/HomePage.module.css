@@ -48,7 +48,7 @@
   z-index: 10; /* Располагает поверх карты */
 }
 
-@media (max-width: 868px) {
+@media (max-width: 668px) {
   .container {
     padding: 8px;
   }
@@ -66,7 +66,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    max-width: 300px;
+    max-width: 400px;
   }
 
   .content {
