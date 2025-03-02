@@ -1,0 +1,41 @@
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  text-align: center;
+}
+
+.not-found-page h1 {
+  font-size: 6rem;
+  margin: 0;
+  animation: float 3s ease-in-out infinite;
+}
+
+.not-found-page p {
+  font-size: 1.5rem;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+  .not-found-page h1 {
+    font-size: 4rem;
+  }
+
+  .not-found-page p {
+    font-size: 1.2rem;
+  }
+}
