@@ -30,7 +30,7 @@
   cursor: grabbing;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 868px) {
   .image {
     width: 100%;
     height: 100%;
