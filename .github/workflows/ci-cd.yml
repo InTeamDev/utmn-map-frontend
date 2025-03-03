@@ -59,12 +59,12 @@ jobs:
 
       - name: Debug SSH key
         run: |
-          echo "SSH key: ${{ secrets.SSH_PRIVATE_KEY }}"
+          echo "SSH key: ${{ secrets.SERVER_SSH_KEY }}"
 
       - name: Install SSH key
         uses: webfactory/ssh-agent@v0.5.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY  }}
 
       - name: Deploy to server
         run: |
