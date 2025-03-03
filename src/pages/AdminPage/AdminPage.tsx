@@ -1,9 +1,9 @@
-import React from "react";
-import { useAuth } from "../../services/auth/AuthContext";
-import "./AdminPage.css";
+import React from 'react'
+import { useAuth } from '../../services/auth/AuthContext'
+import './AdminPage.css'
 
 const AdminPage: React.FC = () => {
-  const { logout } = useAuth();
+  const { logout } = useAuth()
 
   return (
     <div className="admin-page">
@@ -17,7 +17,7 @@ const AdminPage: React.FC = () => {
         <p>Добро пожаловать в админку! Здесь вы можете управлять системой.</p>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage
