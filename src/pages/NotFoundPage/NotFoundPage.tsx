@@ -1,5 +1,5 @@
-import React from "react";
-import "./NotFoundPage.css";
+import React from 'react'
+import './NotFoundPage.css'
 
 const NotFoundPage: React.FC = () => {
   return (
@@ -7,7 +7,7 @@ const NotFoundPage: React.FC = () => {
       <h1>404</h1>
       <p>Страница не найдена</p>
     </div>
-  );
-};
+  )
+}
 
-export default NotFoundPage;
+export default NotFoundPage

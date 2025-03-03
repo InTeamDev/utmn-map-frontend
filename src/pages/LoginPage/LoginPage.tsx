@@ -1,14 +1,14 @@
-import React from "react";
-import { useAuth } from "../../services/auth/AuthContext";
-import "./LoginPage.css";
+import React from 'react'
+import { useAuth } from '../../services/auth/AuthContext'
+import './LoginPage.css'
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login } = useAuth()
 
   const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    login();
-  };
+    e.preventDefault()
+    login()
+  }
 
   return (
     <div className="login-page">
@@ -18,11 +18,7 @@ const LoginPage: React.FC = () => {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label htmlFor="username">Имя пользователя</label>
-            <input
-              type="text"
-              id="username"
-              placeholder="Введите имя пользователя"
-            />
+            <input type="text" id="username" placeholder="Введите имя пользователя" />
           </div>
           <div className="form-group">
             <label htmlFor="password">Пароль</label>
@@ -34,7 +30,7 @@ const LoginPage: React.FC = () => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
