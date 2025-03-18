@@ -1,7 +1,8 @@
 .container {
-  background-color: var(--background-color);
+  background-color: var(--background-color); /* Используем переменную для фона */
   padding: 16px;
   min-height: 100vh;
+  color: var(--text-color); /* Используем переменную для цвета текста */
 }
 
 .navigationPanel {
@@ -39,15 +40,29 @@
   position: absolute; /* Позволяет позиционировать относительно родителя */
   top: 50%; /* Центрирование по вертикали */
   right: 10px; /* Расположение на 10px от правого края */
-  transform: translateY(
-    -50%
-  ); /* Смещение вверх на половину высоты для идеального центрирования */
+  transform: translateY(-50%); /* Смещение вверх на половину высоты для идеального центрирования */
   display: flex;
   flex-direction: column; /* Расположение кнопок вертикально */
   gap: 8px; /* Расстояние между кнопками */
   z-index: 10; /* Располагает поверх карты */
 }
 
+/* Стили для кнопок (если они есть) */
+.buttonContainer button {
+  background-color: var(--button-bg); /* Используем переменную для фона кнопки */
+  color: var(--button-text); /* Используем переменную для текста кнопки */
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buttonContainer button:hover {
+  background-color: var(--button-bg-hover); /* Используем переменную для фона кнопки при наведении */
+}
+
+/* Адаптация для мобильных устройств */
 @media (max-width: 668px) {
   .container {
     padding: 8px;

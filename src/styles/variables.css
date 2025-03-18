@@ -1,10 +1,43 @@
 :root {
-  --primary-color: #007BFF;
-  --secondary-color: #4B4B4B;
-  --background-color: rgba(240, 240, 240);
-  --text-color: #333333;
-  --active-color: #0056b3;
-  --hover-color: #0069d9;
-  --button-bg: #E9ECEF;
-  --dropdown-bg: #FFFFFF;
-} 
+  /* Solarized Light */
+  --background-color: #fdf7e3; /* Base3 */
+  --text-color: #658b83; /* Base00 */
+  --primary-color: #269bd2; /* Blue */
+  --secondary-color: #3aa198; /* Cyan */
+  --label-color: #587e75; /* Base01 */
+  --input-focus-border: #b58901; /* Yellow */
+  --button-bg: #b58901; /* Yellow */
+  --button-bg-hover: #cb5b16; /* Orange */
+  --button-text: #fdf7e3; /* Base3 */
+  --error-color: #dc323f;
+  --dropdown-bg: #fdf7e3; /* Фон dropdown */
+  --border-color: #94a1a1; /* Цвет рамки */
+  --button-text-active: #eee;
+  --tooltip-bg: #fdf7e3; /* Base3 */
+  --tooltip-text: #658b83;
+  --background-color: #fdf6e3;
+  --text-color: #657b83;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    /* Solarized Light */
+    --background-color: #fdf7e3; /* Base3 */
+    --text-color: #658b83; /* Base00 */
+    --primary-color: #269bd2; /* Blue */
+    --secondary-color: #3aa198; /* Cyan */
+    --label-color: #587e75; /* Base01 */
+    --input-focus-border: #b58901; /* Yellow */
+    --button-bg: #b58901; /* Yellow */
+    --button-bg-hover: #cb5b16; /* Orange */
+    --button-text: #fdf7e3; /* Base3 */
+    --error-color: #dc323f;
+    --dropdown-bg: #fdf7e3; /* Фон dropdown */
+    --border-color: #94a1a1; /* Цвет рамки */
+    --button-text-active: #eee;
+    --tooltip-bg: #fdf7e3; /* Base3 */
+    --tooltip-text: #658b83;
+    --background-color: #fdf6e3;
+    --text-color: #657b83;
+  }
+}

@@ -74,3 +74,12 @@
 .dropdown option {
   padding: 8px;
 }
+
+.small {
+  width: 120px;
+}
+
+.smallInput {
+  padding: 8px;
+  font-size: 12px;
+}
