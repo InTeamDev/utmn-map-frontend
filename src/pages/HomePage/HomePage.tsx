@@ -13,7 +13,7 @@ const HomePage: React.FC = () => {
   const [locations, setLocations] = useState<{ [key: string]: string }>({})
   const [floorImage, setFloorImage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [selectedBuilding, setSelectedBuilding] = useState('')
+  const [selectedBuilding, setSelectedBuilding] = useState('улк 5')
 
   const floors = {
     Floor_Fourth: '4',
@@ -38,6 +38,7 @@ const HomePage: React.FC = () => {
         const url = URL.createObjectURL(blob)
         setFloorImage(url)
         const locationsData = await api.getObjects()
+        handleBuildignChange('улк 5')
         setLocations(locationsData)
         setError(null)
       } catch (error) {
@@ -164,13 +165,13 @@ const HomePage: React.FC = () => {
         {error && <Error message={error} />}
         {selectedBuilding && (
           <div className={styles.dropdownContainer}>
-            <Dropdown options={getLocationOptions()} placeholder="Откуда?" onChange={handleFromChange} />
-            <Dropdown options={getLocationOptions()} placeholder="Куда?" onChange={handleToChange} />
+            <Dropdown options={getLocationOptions()} placeholder="Поиск" onChange={handleFromChange} />
+            {from && <Dropdown options={getLocationOptions()} placeholder="Куда?" onChange={handleToChange} />}
           </div>
         )}
-        <div className={styles.buildingDropdownContainer}>
-          <Dropdown options={buildingOptions} placeholder="Выбрать корпус" onChange={handleBuildignChange} />
-        </div>
+        {/* <div className={styles.buildingDropdownContainer}> */}
+        {/*   <Dropdown options={buildingOptions} placeholder="Выбрать корпус" onChange={handleBuildignChange} /> */}
+        {/* </div> */}
       </div>
 
       {selectedBuilding && (
@@ -185,6 +186,8 @@ const HomePage: React.FC = () => {
                   text={displayText}
                   isActive={currentFloor === apiFloor}
                   onClick={() => handleFloorChange(apiFloor)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 />
               ))}
           </div>

@@ -2,7 +2,7 @@
   height: 48px;
   width: 48px;
   background-color: var(--button-bg);
-  color: var(--text-color);
+  color: var(--button-text);
   border: none;
   border-radius: 8px;
   font-size: 16px;
@@ -15,14 +15,13 @@
 }
 
 .button:hover {
-  background-color: var(--hover-color);
-  color: white;
+  background-color: var(--button-bg-hover);
   transform: translateY(-1px);
 }
 
 .active {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--button-text-active);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -30,13 +29,15 @@
   position: absolute;
   left: 100%;
   margin-left: 8px;
-  background: white;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: none;
+  z-index: 1000;
 }
 
 .button:hover .tooltip {

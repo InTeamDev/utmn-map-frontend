@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react'
 import styles from './ImageCard.module.css'
+import { motion } from 'framer-motion'
 
 interface ImageCardProps {
   src: string
@@ -171,32 +172,39 @@ const ImageCard: React.FC<ImageCardProps> = ({ src, alt }) => {
   )
 
   return (
-    <div ref={wrapperRef} className={styles.imageWrapper}>
-      <img
-        ref={imageRef}
-        className={styles.image}
-        src={src}
-        alt={alt}
-        style={{
-          willChange: 'transform',
-          transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault()
-          setPanning(true)
-          setStartPoint({
-            x: e.clientX - positionRef.current.x,
-            y: e.clientY - positionRef.current.y,
-          })
-        }}
-        onMouseMove={handleMouseMove}
-        onMouseUp={() => setPanning(false)}
-        onMouseLeave={() => setPanning(false)}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      />
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={styles.container}
+    >
+      <div ref={wrapperRef} className={styles.imageWrapper}>
+        <img
+          ref={imageRef}
+          className={styles.image}
+          src={src}
+          alt={alt}
+          style={{
+            willChange: 'transform',
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            setPanning(true)
+            setStartPoint({
+              x: e.clientX - positionRef.current.x,
+              y: e.clientY - positionRef.current.y,
+            })
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseUp={() => setPanning(false)}
+          onMouseLeave={() => setPanning(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        />
+      </div>
+    </motion.div>
   )
 }
 
