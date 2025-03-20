@@ -1,5 +1,5 @@
-import React from 'react'
-import { motion, TargetAndTransition } from 'framer-motion' // Импортируем TargetAndTransition
+import React, { memo, useCallback } from 'react'
+import { motion, TargetAndTransition } from 'framer-motion'
 import styles from './Button.module.css'
 
 interface ButtonProps {
@@ -10,17 +10,24 @@ interface ButtonProps {
   whileTap?: TargetAndTransition
 }
 
-const Button: React.FC<ButtonProps> = ({ text, onClick, isActive, whileHover, whileTap }) => {
+const Button: React.FC<ButtonProps> = memo(({ text, onClick, isActive, whileHover, whileTap }) => {
+  // Используем useCallback для оптимизации обработчика клика
+  const handleClick = useCallback(() => {
+    onClick()
+  }, [onClick])
+
   return (
     <motion.button
       className={`${styles.button} ${isActive ? styles.active : ''}`}
-      onClick={onClick}
+      onClick={handleClick}
       whileHover={whileHover}
       whileTap={whileTap}
     >
       {text}
     </motion.button>
   )
-}
+})
+
+Button.displayName = 'Button'
 
 export default Button

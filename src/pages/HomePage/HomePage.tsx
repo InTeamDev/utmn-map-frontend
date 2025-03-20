@@ -1,200 +1,169 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import styles from './HomePage.module.css'
-import Dropdown, { DropdownOption } from '../../components/DropDown/DropDown'
+import Dropdown from '../../components/DropDown/DropDown'
 import ImageCard from '../../components/ImageCard/ImageCard'
 import Button from '../../components/Button/Button'
 import { api } from '../../services/api'
 import Error from '../../components/Error/Error'
 
+const floors = {
+  Floor_Fourth: '4',
+  Floor_Third: '3',
+  Floor_Second: '2',
+  Floor_First: '1',
+} as const
+
 const HomePage: React.FC = () => {
   const [from, setFrom] = useState<string | null>(null)
   const [to, setTo] = useState<string | null>(null)
   const [currentFloor, setCurrentFloor] = useState('Floor_First')
-  const [locations, setLocations] = useState<{ [key: string]: string }>({})
+  const [locations, setLocations] = useState<Record<string, string>>({})
   const [floorImage, setFloorImage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [selectedBuilding, setSelectedBuilding] = useState('улк 5')
 
-  const floors = {
-    Floor_Fourth: '4',
-    Floor_Third: '3',
-    Floor_Second: '2',
-    Floor_First: '1',
-  }
+  // Мемоизация locationOptions
+  const locationOptions = useMemo(() => {
+    if (!Object.keys(locations).length) return []
 
-  const buildings: { [key: string]: string } = {
-    'улк 5': 'Школа компьютерных наук',
-  }
-
-  const buildingOptions: DropdownOption[] = Object.keys(buildings).map((key) => ({
-    value: key,
-    label: buildings[key],
-  }))
-
-  useEffect(() => {
-    const initializeData = async () => {
-      try {
-        const blob = await api.getFloorPlan('Floor_First')
-        const url = URL.createObjectURL(blob)
-        setFloorImage(url)
-        const locationsData = await api.getObjects()
-        handleBuildignChange('улк 5')
-        setLocations(locationsData)
-        setError(null)
-      } catch (error) {
-        setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
-        // TODO: replace console
-        // console.error('Failed to initialize data:', error)
-      }
-    }
-
-    initializeData()
-  }, [])
-
-  const getLocationOptions = () => {
     return Object.entries(locations)
-      .filter(([key]) => {
-        return !key.includes('IDK') && !key.includes('Stairs')
-      })
+      .filter(([key]) => !key.includes('IDK') && !key.includes('Stairs'))
       .map(([key, value]) => {
         const floor = key.split('_')[1]
+        const floorNum = floor === 'First' ? 1 : floor === 'Second' ? 2 : floor === 'Third' ? 3 : 4
 
-        // Заменяем специальные названия
         const label = value
-          .replace(/Toilet[^(]*/g, 'Туалет') // Заменяем Toilet и всё после него до скобок на "Туалет"
+          .replace(/Toilet[^(]*/g, 'Туалет')
           .replace('Gym', 'Спортзал')
           .replace('Kitchen', 'Кухня')
           .replace('Dining', 'Столовая')
           .replace('Wardrobe', 'Гардероб')
-          .replace('First', '1')
-          .replace('Second', '2')
-          .replace('Third', '3')
-          .replace('Fourth', '4')
+          .replace(/(?:First|Second|Third|Fourth)/g, (match) =>
+            String(['First', 'Second', 'Third', 'Fourth'].indexOf(match) + 1),
+          )
 
         return {
           value: key,
           label,
-          floor: parseInt(floor === 'First' ? '1' : floor === 'Second' ? '2' : floor === 'Third' ? '3' : '4'),
+          floor: floorNum,
         }
       })
       .sort((a, b) => {
-        if (a.floor !== b.floor) {
-          return a.floor - b.floor
-        }
+        if (a.floor !== b.floor) return a.floor - b.floor
 
-        const numA = parseInt(a.label.match(/\d+/)?.[0] || '')
-        const numB = parseInt(b.label.match(/\d+/)?.[0] || '')
+        const [numA, numB] = [a.label, b.label].map((label) => parseInt(label.match(/\d+/)?.[0] || '0'))
 
-        if (!isNaN(numA) && !isNaN(numB)) {
-          return numA - numB
-        }
-
-        return a.label.localeCompare(b.label)
+        return numA !== numB ? numA - numB : a.label.localeCompare(b.label)
       })
-  }
+  }, [locations])
 
-  useEffect(() => {
-    const updateRoute = async () => {
-      try {
-        const blob = await api.getFloorPlan(currentFloor, from || undefined, to || undefined)
-        const url = URL.createObjectURL(blob)
-
-        if (floorImage) {
-          URL.revokeObjectURL(floorImage)
-        }
-
-        setFloorImage(url)
-        setError(null)
-      } catch (error) {
-        setError('Не удалось обновить маршрут. Попробуйте еще раз.')
-        //console.error('Failed to update route:', error)
-      }
-    }
-
-    updateRoute()
-  }, [from, to, currentFloor, locations])
-
-  const handleFloorChange = async (floor: string) => {
-    if (floor === currentFloor) return
-
+  // Мемоизация функции обновления изображения этажа
+  const updateFloorImage = useCallback(async (floor: string, fromLoc?: string, toLoc?: string) => {
     try {
-      const blob = await api.getFloorPlan(floor, from || undefined, to || undefined)
+      const blob = await api.getFloorPlan(floor, fromLoc, toLoc)
       const url = URL.createObjectURL(blob)
 
-      if (floorImage) {
-        URL.revokeObjectURL(floorImage)
-      }
+      setFloorImage((prevUrl) => {
+        if (prevUrl) URL.revokeObjectURL(prevUrl) // Очистка предыдущего URL
+        return url
+      })
 
-      setFloorImage(url)
+      setError(null)
+    } catch (err) {
+      setError('Не удалось загрузить план этажа')
+    }
+  }, [])
+
+  // Инициализация данных
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        const locationsData = await api.getObjects()
+        setLocations(locationsData)
+        await updateFloorImage('Floor_First')
+        setError(null)
+      } catch (err) {
+        setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
+      }
+    }
+
+    initializeData()
+
+    // Очистка URL при размонтировании
+    return () => {
+      if (floorImage) URL.revokeObjectURL(floorImage)
+    }
+  }, [updateFloorImage])
+
+  // Обновление маршрута
+  useEffect(() => {
+    if (!currentFloor) return
+    updateFloorImage(currentFloor, from || undefined, to || undefined)
+  }, [from, to, currentFloor, updateFloorImage])
+
+  // Мемоизация обработчика смены этажа
+  const handleFloorChange = useCallback(
+    (floor: string) => {
+      if (floor === currentFloor) return
+      updateFloorImage(floor, from || undefined, to || undefined)
       setCurrentFloor(floor)
-    } catch (error) {
-      // console.error('Failed to fetch floor plan:', error)
-    }
-  }
+    },
+    [currentFloor, from, to, updateFloorImage],
+  )
 
-  const handleFromChange = (value: string | null) => {
-    if (!value) return
-    setFrom(value)
-    const floor = value.split('_')[1]
-    const floorKey = `Floor_${floor}`
-    if (floorKey !== currentFloor) {
-      handleFloorChange(floorKey)
-    }
-  }
+  // Мемоизация обработчика смены локации
+  const handleLocationChange = useCallback(
+    (value: string | null, setter: (value: string | null) => void) => {
+      if (!value) return
+      setter(value)
 
-  const handleToChange = (value: string | null) => {
-    if (!value) return
-    setTo(value)
-    if (from !== null) {
-      const floor = from.split('_')[1]
-      const floorKey = `Floor_${floor}`
-      if (floorKey !== currentFloor) {
-        handleFloorChange(floorKey)
+      const floor = `Floor_${value.split('_')[1]}`
+      if (floor !== currentFloor) {
+        handleFloorChange(floor)
       }
-    }
-  }
-
-  const handleBuildignChange = (value: string | null) => {
-    if (!value) return
-    setSelectedBuilding(value)
-  }
+    },
+    [currentFloor, handleFloorChange],
+  )
 
   return (
     <div className={styles.container}>
       <div className={styles.navigationPanel}>
         {error && <Error message={error} />}
-        {selectedBuilding && (
-          <div className={styles.dropdownContainer}>
-            <Dropdown options={getLocationOptions()} placeholder="Поиск" onChange={handleFromChange} />
-            {from && <Dropdown options={getLocationOptions()} placeholder="Куда?" onChange={handleToChange} />}
-          </div>
-        )}
-        {/* <div className={styles.buildingDropdownContainer}> */}
-        {/*   <Dropdown options={buildingOptions} placeholder="Выбрать корпус" onChange={handleBuildignChange} /> */}
-        {/* </div> */}
+
+        <div className={styles.dropdownContainer}>
+          <Dropdown
+            options={locationOptions}
+            placeholder="Поиск"
+            onChange={(value) => handleLocationChange(value, setFrom)}
+          />
+          {from && (
+            <Dropdown
+              options={locationOptions}
+              placeholder="Куда?"
+              onChange={(value) => handleLocationChange(value, setTo)}
+            />
+          )}
+        </div>
       </div>
 
-      {selectedBuilding && (
-        <div className={styles.content}>
-          {floorImage && <ImageCard src={floorImage} alt="Floor Plan" />}
-          <div className={styles.buttonContainer}>
-            {Object.entries(floors)
-              .reverse()
-              .map(([apiFloor, displayText]) => (
-                <Button
-                  key={apiFloor}
-                  text={displayText}
-                  isActive={currentFloor === apiFloor}
-                  onClick={() => handleFloorChange(apiFloor)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                />
-              ))}
-          </div>
+      <div className={styles.content}>
+        {floorImage && <ImageCard src={floorImage} alt="Floor Plan" />}
+        <div className={styles.buttonContainer}>
+          {Object.entries(floors)
+            .reverse()
+            .map(([apiFloor, displayText]) => (
+              <Button
+                key={apiFloor}
+                text={displayText}
+                isActive={currentFloor === apiFloor}
+                onClick={() => handleFloorChange(apiFloor)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              />
+            ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }
 
-export default HomePage
+export default React.memo(HomePage)
