@@ -69,12 +69,4 @@ jobs:
       - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no root@94.103.92.242 'cd /root/vkr/utmn-map-frontend && git pull origin main'
-          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'cd /root/vkr/utmn-map-frontend && npm install'
-          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'cd /root/vkr/utmn-map-frontend && npm run build'
-          ssh -o StrictHostKeyChecking=no root@94.103.92.242 '
-            if ! sudo systemctl is-active --quiet utmn-frontend.service; then
-              sudo systemctl start utmn-frontend.service
-            else
-              sudo systemctl restart utmn-frontend.service
-            fi
-          '
+          ssh -o StrictHostKeyChecking=no root@94.103.92.242 'sudo systemctl restart utmn-frontend.service'
