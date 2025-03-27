@@ -3,6 +3,7 @@ import { motion, TargetAndTransition } from 'framer-motion'
 import styles from './Button.module.css'
 
 interface ButtonProps {
+  key: string
   text: string
   onClick: () => void
   isActive?: boolean
@@ -14,6 +15,7 @@ const Button: React.FC<ButtonProps> = memo(({ text, onClick, isActive, whileHove
   // Используем useCallback для оптимизации обработчика клика
   const handleClick = useCallback(() => {
     onClick()
+    console.log(text, isActive)
   }, [onClick])
 
   return (

@@ -103,6 +103,7 @@ const HomePage: React.FC = () => {
   // Мемоизация обработчика смены этажа
   const handleFloorChange = useCallback(
     (floor: string) => {
+      console.log(floors, currentFloor)
       if (floor === currentFloor) return
       updateFloorImage(floor, from || undefined, to || undefined)
       setCurrentFloor(floor)
@@ -130,18 +131,18 @@ const HomePage: React.FC = () => {
         {error && <Error message={error} />}
 
         <div className={styles.dropdownContainer}>
-          <Dropdown
-            options={locationOptions}
-            placeholder="Поиск"
-            onChange={(value) => handleLocationChange(value, setFrom)}
-          />
-          {from && (
+          {to && (
             <Dropdown
               options={locationOptions}
-              placeholder="Куда?"
-              onChange={(value) => handleLocationChange(value, setTo)}
+              placeholder="Откуда?"
+              onChange={(value) => handleLocationChange(value, setFrom)}
             />
           )}
+          <Dropdown
+            options={locationOptions}
+            placeholder="Куда?"
+            onChange={(value) => handleLocationChange(value, setTo)}
+          />
         </div>
       </div>
 
