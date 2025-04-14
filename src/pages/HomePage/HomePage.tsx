@@ -75,18 +75,18 @@ const HomePage: React.FC = () => {
 
   // Инициализация данных
   useEffect(() => {
-    const initializeData = async () => {
-      try {
-        const locationsData = await api.getObjects()
-        setLocations(locationsData)
-        await updateFloorImage('Floor_First')
-        setError(null)
-      } catch (err) {
-        setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
-      }
-    }
-
-    initializeData()
+    // const initializeData = async () => {
+    //   try {
+    //     const locationsData = await api.getObjects()
+    //     setLocations(locationsData)
+    //     await updateFloorImage('Floor_First')
+    //     setError(null)
+    //   } catch (err) {
+    //     setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
+    //   }
+    // }
+    //
+    // initializeData()
 
     // Очистка URL при размонтировании
     return () => {
