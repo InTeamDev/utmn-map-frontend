@@ -50,7 +50,7 @@ export const api = {
   },
 
   // Получить объекты на этаже корпуса
-  async getObjectsByBuilding(buildId: string): Promise<MapObject[]> {
+  async getObjectsByBuilding(buildId: string | undefined): Promise<MapObject[]> {
     const cacheKey = `objects-${buildId}`
     const cachedData = cacheService.get<MapObject[]>(cacheKey)
     if (cachedData) return cachedData
