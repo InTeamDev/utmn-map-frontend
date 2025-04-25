@@ -1,0 +1,218 @@
+/* Основной контейнер */
+.canvas-container {
+  position: absolute;
+  top: var(--header-height); /* Задать высоту header — например, 60px */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: var(--background-color);
+}
+
+.floor-buttons {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10;
+  background-color: var(--dropdown-bg);
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+/* Улучшенные стили для кнопок */
+.button {
+  height: 40px;
+  width: 40px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.button:hover {
+  background-color: var(--button-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button.active {
+  background-color: var(--primary-color);
+  color: var(--button-text-active);
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Улучшенные тултипы */
+.tooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  display: none;
+  z-index: 1000;
+  pointer-events: none;
+  border: 1px solid var(--border-color);
+}
+
+.button:hover .tooltip {
+  display: block;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* Панель масштабирования */
+.scale-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--dropdown-bg);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  border: 1px solid var(--border-color);
+}
+
+.scale-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--border-color);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scale-controls button:hover {
+  background: var(--button-bg-hover);
+}
+
+.scale-controls span {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  min-width: 50px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+/* Стили для объектов на canvas */
+.object-cabinet {
+  fill: var(--primary-color);
+}
+.object-wardrobe {
+  fill: var(--secondary-color);
+}
+.object-toilet {
+  fill: var(--button-bg);
+}
+.object-gym {
+  fill: var(--button-bg-hover);
+}
+
+.toggle-infobox-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 9999; /* повыше, чтобы не перекрывалось */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.toggle-infobox-btn:hover {
+  background-color: var(--button-bg-hover);
+  transform: translateY(-1px);
+}
+
+.mode-buttons {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10;
+}
+
+.mode-button {
+  height: 52px;
+  width: 52px;
+  background-color: var(--dropdown-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-button img {
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+
+.mode-button:hover {
+  background-color: var(--button-bg-hover);
+}
+
+.mode-button.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}

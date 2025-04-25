@@ -23,7 +23,6 @@
     "no-useless-concat": "warn", // Предупреждение вместо ошибки
     "react/prop-types": "off", // Отключаем проверку prop-types (если используете TypeScript)
     "@typescript-eslint/no-unused-vars": "warn", // Предупреждение для неиспользуемых переменных
-    "no-console": "warn", // Предупреждение для console.log
     "react/react-in-jsx-scope": "off" // Отключаем обязательный импорт React в JSX (для React 17+)
   },
   "settings": {

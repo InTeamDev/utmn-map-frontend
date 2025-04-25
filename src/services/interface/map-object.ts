@@ -1,6 +1,44 @@
+export interface Door {
+  id: string
+  x: number
+  y: number
+  width: number
+  height: number
+  angle?: number
+}
+
+export interface FloorInfo {
+  id: string
+  name: string
+  alias: string
+}
+
 export interface MapObject {
   id: string
   name: string
-  category: string
-  [key: string]: unknown // Дополнительные свойства
+  alias: string
+  description: string
+  x: number
+  y: number
+  width: number
+  height: number
+  object_type: string
+  doors: Door[] | null
+  floor: FloorInfo
+}
+
+export interface Floor {
+  floor: FloorInfo
+  objects: MapObject[]
+}
+
+export interface BuildingData {
+  objects: {
+    building: {
+      id: string
+      name: string
+      address: string
+    }
+    floors: Floor[]
+  }
 }

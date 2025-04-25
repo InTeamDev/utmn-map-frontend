@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import styles from './HomePage.module.css'
 import Dropdown from '../../components/DropDown/DropDown'
+import styles from './HomePage.module.css'
 import ImageCard from '../../components/ImageCard/ImageCard'
 import Button from '../../components/Button/Button'
 import { api } from '../../services/api'
 import Error from '../../components/Error/Error'
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen' // Импортируем компонент загрузки
 
 const floors = {
   Floor_Fourth: '4',
@@ -20,6 +21,7 @@ const HomePage: React.FC = () => {
   const [locations, setLocations] = useState<Record<string, string>>({})
   const [floorImage, setFloorImage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true) // Состояние загрузки
 
   // Мемоизация locationOptions
   const locationOptions = useMemo(() => {
@@ -58,6 +60,11 @@ const HomePage: React.FC = () => {
 
   // Мемоизация функции обновления изображения этажа
   const updateFloorImage = useCallback(async (floor: string, fromLoc?: string, toLoc?: string) => {
+    setIsLoading(true)
+    setTimeout(() => {
+      console.log('Delayed for 1 second.')
+    }, 1.5 * 1000)
+
     try {
       const blob = await api.getFloorPlan(floor, fromLoc, toLoc)
       const url = URL.createObjectURL(blob)
@@ -70,23 +77,32 @@ const HomePage: React.FC = () => {
       setError(null)
     } catch (err) {
       setError('Не удалось загрузить план этажа')
+    } finally {
+      setIsLoading(false)
     }
   }, [])
 
   // Инициализация данных
   useEffect(() => {
-    // const initializeData = async () => {
-    //   try {
-    //     const locationsData = await api.getObjects()
-    //     setLocations(locationsData)
-    //     await updateFloorImage('Floor_First')
-    //     setError(null)
-    //   } catch (err) {
-    //     setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
-    //   }
-    // }
-    //
-    // initializeData()
+    const initializeData = async () => {
+      setIsLoading(true)
+      setTimeout(() => {
+        /*Your Code*/
+      }, 5000000)
+
+      try {
+        //   const locationsData = await api.getObjects()
+        //   setLocations(locationsData)
+        //   await updateFloorImage('Floor_First')
+        //   setError(null)
+      } catch (err) {
+        setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    initializeData()
 
     // Очистка URL при размонтировании
     return () => {
@@ -124,6 +140,11 @@ const HomePage: React.FC = () => {
     },
     [currentFloor, handleFloorChange],
   )
+
+  // Показываем экран загрузки, пока данные загружаются
+  if (isLoading) {
+    return <LoadingScreen />
+  }
 
   return (
     <div className={styles.container}>

@@ -17,6 +17,7 @@
   --tooltip-text: #658b83;
   --background-color: #fdf6e3;
   --text-color: #657b83;
+  --header-height: 60px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -39,5 +40,6 @@
     --tooltip-text: #658b83;
     --background-color: #fdf6e3;
     --text-color: #657b83;
+    --header-height: 60px;
   }
 }

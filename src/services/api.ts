@@ -1,8 +1,10 @@
+import { create } from 'domain'
+import { NewObject } from '../components/Canvas/CreateObjectModal/CreateObjectModal'
 import { cacheService } from './cacheService'
-import { BuildingsResponse } from './interface/building'
+import { Building, BuildingsResponse } from './interface/building'
 import { Category } from './interface/category'
 import { Floor } from './interface/floor'
-import { MapObject } from './interface/map-object'
+import { BuildingData } from './interface/map-object'
 import { MapPath } from './interface/map-path'
 
 declare const process: {
@@ -32,6 +34,36 @@ export const api = {
     return data
   },
 
+  async createBuilding(building: { name: string; address: string; description: string }): Promise<Building> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(building),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to create building')
+    }
+    return response.json()
+  },
+
+  async createObject(data: NewObject): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/api/objects`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to create object')
+    }
+    return response.json()
+  },
+
   async getFloors(buildId: string): Promise<Floor[]> {
     const cacheKey = `floors-${buildId}`
     const cachedData = cacheService.get<Floor[]>(cacheKey)
@@ -50,25 +82,25 @@ export const api = {
   },
 
   // Получить объекты на этаже корпуса
-  async getObjectsByBuilding(buildId: string | undefined): Promise<MapObject[]> {
+  async getObjectsByBuilding(buildId: string | undefined): Promise<BuildingData> {
     const cacheKey = `objects-${buildId}`
-    const cachedData = cacheService.get<MapObject[]>(cacheKey)
+    const cachedData = cacheService.get<BuildingData>(cacheKey)
     if (cachedData) return cachedData
 
     const response = await fetch(`${API_BASE_URL}/api/buildings/${buildId}/objects`)
-    const data = await handleResponse<MapObject[]>(response)
+    const data = await handleResponse<BuildingData>(response)
     cacheService.set(cacheKey, data)
     return data
   },
 
   // Поиск объектов в корпусе
-  async search(buildId: string, query: string): Promise<MapObject[]> {
+  async search(buildId: string, query: string): Promise<BuildingData> {
     const cacheKey = `search-${buildId}-${query}`
-    const cachedData = cacheService.get<MapObject[]>(cacheKey)
+    const cachedData = cacheService.get<BuildingData>(cacheKey)
     if (cachedData) return cachedData
 
     const response = await fetch(`${API_BASE_URL}/api/buildings/${buildId}/search?query=${encodeURIComponent(query)}`)
-    const data = await handleResponse<MapObject[]>(response)
+    const data = await handleResponse<BuildingData>(response)
     cacheService.set(cacheKey, data)
     return data
   },
