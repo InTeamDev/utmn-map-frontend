@@ -1,4 +1,3 @@
-import { create } from 'domain'
 import { NewObject } from '../components/Canvas/CreateObjectModal/CreateObjectModal'
 import { cacheService } from './cacheService'
 import { Building, BuildingsResponse } from './interface/building'
@@ -9,11 +8,11 @@ import { MapPath } from './interface/map-path'
 
 declare const process: {
   env: {
-    REACT_APP_API_BASE_URL?: string
+    REACT_APP_PUBLIC_API: string
   }
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080'
+const API_BASE_URL = process.env.REACT_APP_PUBLIC_API
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {

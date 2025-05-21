@@ -1,47 +1,39 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Dropdown from '../../components/DropDown/DropDown'
 import styles from './HomePage.module.css'
-import ImageCard from '../../components/ImageCard/ImageCard'
-import Button from '../../components/Button/Button'
-import { api } from '../../services/api'
+import { api } from '../../services/public.api'
 import Error from '../../components/Error/Error'
-import LoadingScreen from '../../components/LoadingScreen/LoadingScreen' // Импортируем компонент загрузки
-
-const floors = {
-  Floor_Fourth: '4',
-  Floor_Third: '3',
-  Floor_Second: '2',
-  Floor_First: '1',
-} as const
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
+import InteractiveCanvas from '../../components/Canvas/Canvas'
+import { useParams } from 'react-router-dom'
+import { BuildingData } from '../../services/interface/map-object'
 
 const HomePage: React.FC = () => {
+  const { buildingId } = useParams<{ buildingId: string }>()
   const [from, setFrom] = useState<string | null>(null)
   const [to, setTo] = useState<string | null>(null)
   const [currentFloor, setCurrentFloor] = useState('Floor_First')
   const [locations, setLocations] = useState<Record<string, string>>({})
-  const [floorImage, setFloorImage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true) // Состояние загрузки
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Мемоизация locationOptions
   const locationOptions = useMemo(() => {
     if (!Object.keys(locations).length) return []
 
     return Object.entries(locations)
-      .filter(([key]) => !key.includes('IDK') && !key.includes('Stairs'))
+      .filter(([key, value]) => {
+        const hasValidAlias = value && !value.includes('???')
+        const isNotIDK = !key.includes('IDK')
+        const isNotStairs = !key.includes('Stairs')
+        return hasValidAlias && isNotIDK && isNotStairs
+      })
       .map(([key, value]) => {
         const floor = key.split('_')[1]
         const floorNum = floor === 'First' ? 1 : floor === 'Second' ? 2 : floor === 'Third' ? 3 : 4
 
-        const label = value
-          .replace(/Toilet[^(]*/g, 'Туалет')
-          .replace('Gym', 'Спортзал')
-          .replace('Kitchen', 'Кухня')
-          .replace('Dining', 'Столовая')
-          .replace('Wardrobe', 'Гардероб')
-          .replace(/(?:First|Second|Third|Fourth)/g, (match) =>
-            String(['First', 'Second', 'Third', 'Fourth'].indexOf(match) + 1),
-          )
+        const label = value.replace(/(?:First|Second|Third|Fourth)/g, (match) =>
+          String(['First', 'Second', 'Third', 'Fourth'].indexOf(match) + 1),
+        )
 
         return {
           value: key,
@@ -51,50 +43,20 @@ const HomePage: React.FC = () => {
       })
       .sort((a, b) => {
         if (a.floor !== b.floor) return a.floor - b.floor
-
         const [numA, numB] = [a.label, b.label].map((label) => parseInt(label.match(/\d+/)?.[0] || '0'))
-
         return numA !== numB ? numA - numB : a.label.localeCompare(b.label)
       })
   }, [locations])
 
-  // Мемоизация функции обновления изображения этажа
-  const updateFloorImage = useCallback(async (floor: string, fromLoc?: string, toLoc?: string) => {
-    setIsLoading(true)
-    setTimeout(() => {
-      console.log('Delayed for 1 second.')
-    }, 1.5 * 1000)
-
-    try {
-      const blob = await api.getFloorPlan(floor, fromLoc, toLoc)
-      const url = URL.createObjectURL(blob)
-
-      setFloorImage((prevUrl) => {
-        if (prevUrl) URL.revokeObjectURL(prevUrl) // Очистка предыдущего URL
-        return url
-      })
-
-      setError(null)
-    } catch (err) {
-      setError('Не удалось загрузить план этажа')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  // Инициализация данных
+  // Инициализация данных (объекты)
   useEffect(() => {
     const initializeData = async () => {
       setIsLoading(true)
-      setTimeout(() => {
-        /*Your Code*/
-      }, 5000000)
-
       try {
-        //   const locationsData = await api.getObjects()
-        //   setLocations(locationsData)
-        //   await updateFloorImage('Floor_First')
-        //   setError(null)
+        const locationsData = await api.getObjectsByBuilding(buildingId)
+        const mappedLocations = transformLocationsData(locationsData)
+        setLocations(mappedLocations)
+        setError(null)
       } catch (err) {
         setError('Не удалось загрузить данные. Пожалуйста, обновите страницу.')
       } finally {
@@ -103,31 +65,28 @@ const HomePage: React.FC = () => {
     }
 
     initializeData()
+  }, [])
 
-    // Очистка URL при размонтировании
-    return () => {
-      if (floorImage) URL.revokeObjectURL(floorImage)
-    }
-  }, [updateFloorImage])
+  const transformLocationsData = (data: BuildingData): Record<string, string> => {
+    const result: Record<string, string> = {}
 
-  // Обновление маршрута
-  useEffect(() => {
-    if (!currentFloor) return
-    updateFloorImage(currentFloor, from || undefined, to || undefined)
-  }, [from, to, currentFloor, updateFloorImage])
+    data.objects.floors.forEach((floor) => {
+      floor.objects.forEach((obj) => {
+        result[obj.id] = obj.name
+      })
+    })
 
-  // Мемоизация обработчика смены этажа
+    return result
+  }
+
   const handleFloorChange = useCallback(
     (floor: string) => {
-      console.log(floors, currentFloor)
       if (floor === currentFloor) return
-      updateFloorImage(floor, from || undefined, to || undefined)
       setCurrentFloor(floor)
     },
-    [currentFloor, from, to, updateFloorImage],
+    [currentFloor],
   )
 
-  // Мемоизация обработчика смены локации
   const handleLocationChange = useCallback(
     (value: string | null, setter: (value: string | null) => void) => {
       if (!value) return
@@ -141,7 +100,6 @@ const HomePage: React.FC = () => {
     [currentFloor, handleFloorChange],
   )
 
-  // Показываем экран загрузки, пока данные загружаются
   if (isLoading) {
     return <LoadingScreen />
   }
@@ -168,21 +126,7 @@ const HomePage: React.FC = () => {
       </div>
 
       <div className={styles.content}>
-        {floorImage && <ImageCard src={floorImage} alt="Floor Plan" />}
-        <div className={styles.buttonContainer}>
-          {Object.entries(floors)
-            .reverse()
-            .map(([apiFloor, displayText]) => (
-              <Button
-                key={apiFloor}
-                text={displayText}
-                isActive={currentFloor === apiFloor}
-                onClick={() => handleFloorChange(apiFloor)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              />
-            ))}
-        </div>
+        <InteractiveCanvas showPanel={false} showEditBtns={false} />
       </div>
     </div>
   )

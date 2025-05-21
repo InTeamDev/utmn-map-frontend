@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { api } from '../../services/api'
+import { api } from '../../services/public.api'
 import { BuildingData } from '../../services/interface/map-object'
 import './Canvas.css'
 import { CreationModal, NewObject } from './CreateObjectModal/CreateObjectModal'
@@ -24,7 +24,12 @@ const OBJECT_COLORS: Record<ObjectType, string> = {
 
 const DEFAULT_OBJECT_COLOR = 'rgba(200,200,200,0.5)'
 
-const InteractiveCanvas: React.FC = () => {
+interface InteractiveCanvasProps {
+  showPanel?: boolean
+  showEditBtns?: boolean
+}
+
+const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false, showEditBtns = false }) => {
   const { buildingId } = useParams<{ buildingId: string }>()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [buildingData, setBuildingData] = useState<BuildingData | null>(null)
@@ -58,6 +63,7 @@ const InteractiveCanvas: React.FC = () => {
     ;(async () => {
       try {
         const data = await api.getObjectsByBuilding(buildingId)
+        console.log(data)
         setBuildingData(data)
         if (data.objects.floors.length > 0) setCurrentFloor(data.objects.floors[0].floor.name)
       } catch (err) {
@@ -97,6 +103,26 @@ const InteractiveCanvas: React.FC = () => {
           ctx.strokeRect(door.x, door.y, door.width, door.height)
         })
       })
+
+      // Отрисовка background (если есть)
+      if (floor.background && floor.background.length > 0) {
+        floor.background.forEach((bg) => {
+          if (!bg.points || bg.points.length < 2) return
+
+          ctx.beginPath()
+          const firstPoint = bg.points[0]
+          ctx.moveTo(firstPoint.x, firstPoint.y)
+          for (let i = 1; i < bg.points.length; i++) {
+            const p = bg.points[i]
+            ctx.lineTo(p.x, p.y)
+          }
+          ctx.closePath()
+          ctx.fillStyle = 'rgba(200, 200, 200, 0.3)' // цвет и прозрачность фона
+          ctx.fill()
+          ctx.strokeStyle = 'rgba(150, 150, 150, 0.8)' // контур
+          ctx.stroke()
+        })
+      }
 
       ctx.restore()
     },
@@ -268,48 +294,52 @@ const InteractiveCanvas: React.FC = () => {
         onSubmit={handleCreateObject}
       />
 
-      {/* Режимы */}
-      <div className="mode-buttons">
-        <button
-          onClick={() => setMode('select')}
-          className={`mode-button ${mode === 'select' ? 'active' : ''}`}
-          title="Выбрать объект"
-        >
-          <span className="material-icons">touch_app</span>
-        </button>
+      {showEditBtns && (
+        <>
+          {/* Режимы */}
+          <div className="mode-buttons">
+            <button
+              onClick={() => setMode('select')}
+              className={`mode-button ${mode === 'select' ? 'active' : ''}`}
+              title="Выбрать объект"
+            >
+              <span className="material-icons">touch_app</span>
+            </button>
 
-        <button
-          onClick={() => setMode('create')}
-          className={`mode-button ${mode === 'create' ? 'active' : ''}`}
-          title="Создать объект"
-        >
-          <span className="material-icons">add_circle</span>
-        </button>
+            <button
+              onClick={() => setMode('create')}
+              className={`mode-button ${mode === 'create' ? 'active' : ''}`}
+              title="Создать объект"
+            >
+              <span className="material-icons">add_circle</span>
+            </button>
 
-        <button
-          onClick={() => setMode('move')}
-          className={`mode-button ${mode === 'move' ? 'active' : ''}`}
-          title="Переместить карту"
-        >
-          <span className="material-icons">open_with</span>
-        </button>
+            <button
+              onClick={() => setMode('move')}
+              className={`mode-button ${mode === 'move' ? 'active' : ''}`}
+              title="Переместить карту"
+            >
+              <span className="material-icons">open_with</span>
+            </button>
 
-        <button
-          onClick={() => setMode('route')}
-          className={`mode-button ${mode === 'route' ? 'active' : ''}`}
-          title="Построить маршрут"
-        >
-          <span className="material-icons">route</span>
-        </button>
+            <button
+              onClick={() => setMode('route')}
+              className={`mode-button ${mode === 'route' ? 'active' : ''}`}
+              title="Построить маршрут"
+            >
+              <span className="material-icons">route</span>
+            </button>
 
-        <button
-          onClick={() => setMode('polygon')}
-          className={`mode-button ${mode === 'polygon' ? 'active' : ''}`}
-          title="Рисовать полигон"
-        >
-          <span className="material-icons">edit</span>
-        </button>
-      </div>
+            <button
+              onClick={() => setMode('polygon')}
+              className={`mode-button ${mode === 'polygon' ? 'active' : ''}`}
+              title="Рисовать полигон"
+            >
+              <span className="material-icons">edit</span>
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Навигация этажи */}
       <FloorButtons
@@ -318,20 +348,24 @@ const InteractiveCanvas: React.FC = () => {
         onFloorChange={handleFloorChange}
       />
 
-      {/* show/hide info */}
-      <button className="toggle-infobox-btn" onClick={() => setInfoBoxVisible((v) => !v)}>
-        {isInfoBoxVisible ? 'Скрыть панель' : 'Показать панель'}
-      </button>
-      {isInfoBoxVisible && (
-        <InfoBox
-          buildingData={{
-            name: buildingData.objects.building.name,
-            address: buildingData.objects.building.address,
-            description: buildingData.objects.building.name,
-          }}
-          selectedObject={selectedObject}
-          floorNumber={buildingData.objects.floors.findIndex((f) => f.floor.name === currentFloor) + 1}
-        />
+      {showPanel && (
+        <>
+          {/* show/hide info */}
+          <button className="toggle-infobox-btn" onClick={() => setInfoBoxVisible((v) => !v)}>
+            {isInfoBoxVisible ? 'Скрыть панель' : 'Показать панель'}
+          </button>
+          {isInfoBoxVisible && (
+            <InfoBox
+              buildingData={{
+                name: buildingData.objects.building.name,
+                address: buildingData.objects.building.address,
+                description: buildingData.objects.building.name,
+              }}
+              selectedObject={selectedObject}
+              floorNumber={buildingData.objects.floors.findIndex((f) => f.floor.name === currentFloor) + 1}
+            />
+          )}
+        </>
       )}
 
       {/* Масштаб */}

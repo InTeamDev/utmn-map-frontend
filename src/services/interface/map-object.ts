@@ -1,3 +1,14 @@
+export interface Point {
+  x: number
+  y: number
+}
+
+export interface Polygon {
+  id: string
+  name?: string
+  points: Point[]
+}
+
 export interface Door {
   id: string
   x: number
@@ -29,6 +40,7 @@ export interface MapObject {
 
 export interface Floor {
   floor: FloorInfo
+  background: Polygon[] // ← новое поле
   objects: MapObject[]
 }
 

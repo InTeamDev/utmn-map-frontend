@@ -15,7 +15,6 @@ const Button: React.FC<ButtonProps> = memo(({ text, onClick, isActive, whileHove
   // Используем useCallback для оптимизации обработчика клика
   const handleClick = useCallback(() => {
     onClick()
-    console.log(text, isActive)
   }, [onClick])
 
   return (

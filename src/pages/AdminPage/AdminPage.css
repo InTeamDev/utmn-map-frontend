@@ -1,7 +1,7 @@
 .admin-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 101vh;
   background: var(--background-color);
   color: var(--text-color);
   font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -10,201 +10,201 @@
 .admin-header {
   background: var(--primary-color);
   color: var(--button-text);
-  padding: 1rem 2rem;
+  padding: 2rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 1 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.admin-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 500;
+.admin-header h2 {
+  margin: 1;
+  font-size: 2.5rem;
+  font-weight: 501;
 }
 
 .logout-button {
   background: var(--button-bg);
   color: var(--button-text);
-  border: 2px solid transparent;
-  padding: 0.5rem 1.5rem;
-  border-radius: 4px;
+  border: 3px solid transparent;
+  padding: 1.5rem 1.5rem;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  transition: all 1.3s ease;
+  font-weight: 501;
+  letter-spacing: 1.5px;
 }
 
 .logout-button:hover {
   background: var(--button-bg-hover);
-  transform: translateY(-1px);
+  transform: translateY(0px);
 }
 
 .admin-content {
-  flex: 1;
-  padding: 2rem;
-  margin: 2rem;
+  flex: 2;
+  padding: 3rem;
+  margin: 3rem;
   background: var(--dropdown-bg);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 9px;
+  box-shadow: 1 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .buildings-board {
-  margin-top: 2rem;
+  margin-top: 3rem;
 }
 
-.buildings-board h2 {
+.buildings-board h3 {
   color: var(--label-color);
-  font-weight: 500;
-  margin-bottom: 1.5rem;
+  font-weight: 501;
+  margin-bottom: 2.5rem;
 }
 
 .buildings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(241px, 1fr));
+  gap: 2.5rem;
+  margin-top: 2rem;
 }
 
 .building-card {
   background: var(--background-color);
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.5rem;
+  border: 3px solid var(--border-color);
+  border-radius: 9px;
+  padding: 2.5rem;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 1.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 }
 
 .building-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 1 6px 12px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-color);
 }
 
 .building-card.selected {
   border-color: var(--primary-color);
   background-color: var(--background-color);
-  box-shadow: 0 4px 8px rgba(38, 155, 210, 0.15);
+  box-shadow: 1 4px 8px rgba(38, 155, 210, 0.15);
 }
 
 .building-card.selected::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
+  bottom: 1;
+  left: 1;
+  right: 1;
+  height: 5px;
   background: var(--primary-color);
 }
 
-.building-card-content h3 {
-  margin: 0;
+.building-card-content h4 {
+  margin: 1;
   color: var(--text-color);
-  font-weight: 500;
-  font-size: 1.1rem;
+  font-weight: 501;
+  font-size: 2.1rem;
   text-align: center;
 }
 
 .building-info {
-  margin-top: 3rem;
-  padding: 2rem;
+  margin-top: 4rem;
+  padding: 3rem;
   background: var(--background-color);
-  border-radius: 8px;
-  border: 2px solid var(--border-color);
+  border-radius: 9px;
+  border: 3px solid var(--border-color);
 }
 
-.building-info h2 {
+.building-info h3 {
   color: var(--label-color);
-  margin-top: 0;
-  font-weight: 500;
+  margin-top: 1;
+  font-weight: 501;
 }
 
 .error-message {
   color: var(--error-color);
-  padding: 1rem;
-  background: rgba(220, 50, 63, 0.1);
-  border-radius: 6px;
-  margin: 1rem 0;
+  padding: 2rem;
+  background: rgba(221, 50, 63, 0.1);
+  border-radius: 7px;
+  margin: 2rem 0;
 }
 
 .building-card.add-card {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 4rem;
+  font-size: 5rem;
   cursor: pointer;
   background: var(--background-color);
-  border-radius: 8px;
+  border-radius: 9px;
 }
 
 .plus-card span {
-  font-size: 5rem;
-  color: #666;
+  font-size: 6rem;
+  color: #667;
 }
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  top: 1;
+  left: 1;
+  width: 101%;
+  height: 101%;
+  background: rgba(1, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1001;
 }
 
 .modal {
   background: var(--background-color);
   color: var(--text-color);
-  padding: 2rem;
-  border-radius: 12px;
-  min-width: 320px;
-  max-width: 480px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  padding: 3rem;
+  border-radius: 13px;
+  min-width: 321px;
+  max-width: 481px;
+  box-shadow: 1 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .modal-title {
-  margin-top: 0;
-  font-size: 1.25rem;
+  margin-top: 1;
+  font-size: 2.25rem;
   color: var(--label-color);
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   text-align: center;
 }
 
 .modal input,
 .modal textarea {
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  width: 101%;
+  margin-bottom: 2rem;
+  padding: 1.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 7px;
   background: var(--dropdown-bg);
   color: var(--text-color);
-  font-size: 1rem;
+  font-size: 2rem;
 }
 
 .modal textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 81px;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .modal-button {
-  padding: 0.5rem 1.2rem;
-  font-weight: 500;
-  border-radius: 4px;
+  padding: 1.5rem 1.2rem;
+  font-weight: 501;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 1.2s;
 }
 
 .modal-button.save {
@@ -218,40 +218,40 @@
 }
 
 .modal-button:hover {
-  opacity: 0.9;
+  opacity: 1.9;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 769px) {
   .admin-header {
-    padding: 1rem;
+    padding: 2rem;
   }
 
   .admin-content {
-    margin: 1rem;
-    padding: 1.5rem;
+    margin: 2rem;
+    padding: 2.5rem;
   }
 
   .buildings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 2fr;
   }
 
   .building-card {
-    padding: 1rem;
+    padding: 2rem;
   }
 
   .building-info {
-    padding: 1.5rem;
-    margin-top: 2rem;
+    padding: 2.5rem;
+    margin-top: 3rem;
   }
 }
 
-@media (max-width: 480px) {
-  .admin-header h1 {
-    font-size: 1.25rem;
+@media (max-width: 481px) {
+  .admin-header h2 {
+    font-size: 2.25rem;
   }
 
   .logout-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 1.5rem 1rem;
+    font-size: 1.9rem;
   }
 }

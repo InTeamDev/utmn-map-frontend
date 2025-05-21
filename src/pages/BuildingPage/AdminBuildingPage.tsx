@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { api } from '../../services/api'
+import { api } from '../../services/public.api'
 import { useAuth } from '../../services/auth/AuthContext'
 import { Building, BuildingsResponse } from '../../services/interface/building'
 import '../AdminPage/AdminPage.css'
@@ -51,7 +51,7 @@ const BuildingDetails: React.FC = () => {
 
         {building && (
           <div className="objects-section">
-            <InteractiveCanvas />
+            <InteractiveCanvas showPanel={true} showEditBtns={true} />
           </div>
         )}
       </main>
