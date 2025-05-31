@@ -293,6 +293,12 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     if (currentFloor) drawFloor(currentFloor)
   }, [currentFloor, drawFloor])
 
+  const handleResetScale = useCallback(() => {
+    transformState.current.scale = 1
+    setScaleValue(1)
+    if (currentFloor) drawFloor(currentFloor)
+  }, [currentFloor, drawFloor])
+
   if (!buildingData) return <div>Loading...</div>
 
   return (
@@ -382,7 +388,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       )}
 
       {/* Масштаб */}
-      <ScaleControls scale={scaleValue} onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
+      <ScaleControls scale={scaleValue} onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} onResetScale={handleResetScale} />
     </div>
   )
 }

@@ -2,28 +2,32 @@
   position: relative; /* Это важно для absolute-позиционирования дочерних элементов */
   background-color: var(--background-color); /* Используем переменную для фона */
   width: 100%;
-  height: 100vh; /* Занимаем всю высоту viewport */
+  height: calc(100vh - 48px); /* Занимаем всю высоту viewport минус header */
   overflow: hidden; /* Чтобы ничего не выходило за границы */
+  display: flex;
+  flex-direction: row;
 }
 
 .navigationPanel {
-  position: fixed;
+  /* position: fixed; */
+  position: relative;
   top: 0;
   left: 0;
   width: 250px;
-  height: 100vh;
+  height: 100%;
   background-color: #f8f8f8;
   border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
   gap: 16px;
-  z-index: 1000;
+  z-index: 10;
   overflow-y: auto;
 }
 
 .dropdownContainer {
   display: flex;
+  margin-top: 48px;
   flex-direction: column;
   gap: 8px;
 }
@@ -51,7 +55,7 @@
   transform: translateY(-50%); /* Смещение вверх на половину высоты для идеального центрирования */
   display: flex;
   flex-direction: column; /* Расположение кнопок вертикально */
-  gap: 8px; /* Расстояние между кнопками */
+  gap: 4px; /* Расстояние между кнопками */
   z-index: 10; /* Располагает поверх карты */
 }
 

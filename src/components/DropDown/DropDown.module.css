@@ -8,8 +8,8 @@
   display: flex;
   align-items: center;
   background: #e3e3e3;
-  border-radius: 16px;
-  height: 60px;
+  border-radius: 12px;
+  height: 45px;
   padding: 0 20px;
   position: relative;
   width: 100%;
@@ -35,7 +35,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-size: 28px;
+  font-size: 18px;
   color: #656565;
   font-family: inherit;
   padding: 0;
@@ -46,7 +46,7 @@
 .input::placeholder {
   color: #656565;
   opacity: 1;
-  font-size: 28px;
+  font-size: 18px;
 }
 
 .optionsList {

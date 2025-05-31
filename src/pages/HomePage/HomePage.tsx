@@ -7,6 +7,7 @@ import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import InteractiveCanvas from '../../components/Canvas/Canvas'
 import { useParams } from 'react-router-dom'
 import { BuildingData } from '../../services/interface/map-object'
+import Header from '../../components/Header/Header'
 
 const HomePage: React.FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>()
@@ -102,18 +103,25 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.navigationPanel}>
-        {error && <Error message={error} />}
+    <>
+      <Header />
+      <div className={styles.container}>
+        <div className={styles.navigationPanel}>
+          {error && <Error message={error} />}
 
-        <div className={styles.dropdownContainer}>
-          <Dropdown options={locationOptions} placeholder="Откуда?" onChange={(value) => handleLocationChange(value)} />
-          <Dropdown options={locationOptions} placeholder="Куда?" onChange={(value) => handleLocationChange(value)} />
+          <div className={styles.dropdownContainer}>
+            <Dropdown
+              options={locationOptions}
+              placeholder="Откуда?"
+              onChange={(value) => handleLocationChange(value)}
+            />
+            <Dropdown options={locationOptions} placeholder="Куда?" onChange={(value) => handleLocationChange(value)} />
+          </div>
         </div>
-      </div>
 
-      <InteractiveCanvas showPanel={false} showEditBtns={false} />
-    </div>
+        <InteractiveCanvas showPanel={false} showEditBtns={false} />
+      </div>
+    </>
   )
 }
 

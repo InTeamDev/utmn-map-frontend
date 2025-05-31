@@ -23,7 +23,7 @@
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
   z-index: 10;
   /* Удаляем фон и рамки */
   background: none;

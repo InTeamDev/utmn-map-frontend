@@ -36,9 +36,7 @@ const BuildingsPage: React.FC = () => {
 
   return (
     <div className="buildings-page">
-      <header className="buildings-header">
-        <h1>Выбор здания</h1>
-      </header>
+     
 
       <main className="buildings-content">
         {loading && <p>Загрузка строений...</p>}
