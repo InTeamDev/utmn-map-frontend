@@ -125,9 +125,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.content}>
-        <InteractiveCanvas showPanel={false} showEditBtns={false} />
-      </div>
+      <InteractiveCanvas showPanel={false} showEditBtns={false} />
     </div>
   )
 }

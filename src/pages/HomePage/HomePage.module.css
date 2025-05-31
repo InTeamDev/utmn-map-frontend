@@ -1,23 +1,34 @@
 .container {
+  position: relative; /* Это важно для absolute-позиционирования дочерних элементов */
   background-color: var(--background-color); /* Используем переменную для фона */
-  padding: 16px;
-  min-height: 100vh;
-  color: var(--text-color); /* Используем переменную для цвета текста */
+  width: 100%;
+  height: 100vh; /* Занимаем всю высоту viewport */
+  overflow: hidden; /* Чтобы ничего не выходило за границы */
 }
 
 .navigationPanel {
-  max-width: 100%; /* Расширяем панель на всю ширину */
-  margin-bottom: 16px;
-  display: flex; /* Делаем контейнер flex */
-  justify-content: space-between; /* Распределяем элементы по ширине */
-  align-items: flex-start; /* Выравниваем элементы по верхнему краю */
-  gap: 16px; /* Расстояние между элементами */
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 16px;
+  z-index: 1000;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  pointer-events: none;
+  width: auto; /* <-- не растягиваем на 100% */
+  max-width: 100%;
+}
+
+.navigationPanel > * {
+  pointer-events: auto;
 }
 
 .dropdownContainer {
   display: flex;
-  flex-direction: column; /* Расположение Dropdown вертикально */
-  gap: 8px; /* Расстояние между Dropdown */
+  flex-direction: column;
+  gap: 8px;
 }
 
 .buildingDropdownContainer {
@@ -78,10 +89,8 @@
   }
 
   .dropdownContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    max-width: 400px;
+    width: fit-content; /* или max-content */
+    pointer-events: auto;
   }
 
   .content {

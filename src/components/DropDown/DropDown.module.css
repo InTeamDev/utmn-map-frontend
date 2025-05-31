@@ -1,6 +1,6 @@
 .dropdownContainer {
-  position: relative;
-  width: 100%;
+  width: fit-content; /* или max-content */
+  pointer-events: auto;
 }
 
 .input {
