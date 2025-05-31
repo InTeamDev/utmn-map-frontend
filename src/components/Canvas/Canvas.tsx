@@ -63,7 +63,6 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     ;(async () => {
       try {
         const data = await api.getObjectsByBuilding(buildingId)
-        console.log(data)
         setBuildingData(data)
         if (data.objects.floors.length > 0) setCurrentFloor(data.objects.floors[0].floor.name)
       } catch (err) {
