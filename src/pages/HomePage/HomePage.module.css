@@ -7,22 +7,19 @@
 }
 
 .navigationPanel {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  padding: 16px;
-  z-index: 1000;
-  background-color: transparent;
+  width: 280px;
+  height: 100vh;
+  background-color: #f8f8f8;
+  border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+  padding: 24px 16px;
   gap: 16px;
-  pointer-events: none;
-  width: auto; /* <-- не растягиваем на 100% */
-  max-width: 100%;
-}
-
-.navigationPanel > * {
-  pointer-events: auto;
+  z-index: 1000;
+  overflow-y: auto;
 }
 
 .dropdownContainer {
