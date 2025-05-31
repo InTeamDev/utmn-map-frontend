@@ -105,15 +105,26 @@ const Dropdown: React.FC<DropdownProps> = ({
   return (
     <motion.div {...containerAnimation} className={styles.container}>
       <div className={classNames(styles.dropdownContainer, { [styles.small]: small })} ref={dropdownRef}>
-        <input
-          type="text"
-          className={classNames(styles.input, { [styles.smallInput]: small })}
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          onFocus={() => setIsOpen(true)}
-        />
+        <div className={styles.innerBox}>
+          <span className={styles.iconLeft}>
+            {/* Геометка SVG */}
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#656565" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C8 2 4 6 4 10c0 5.25 7 12 8 12s8-6.75 8-12c0-4-4-8-8-8z"/></svg>
+          </span>
+          <input
+            type="text"
+            className={classNames(styles.input, { [styles.smallInput]: small })}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            onFocus={() => setIsOpen(true)}
+            autoComplete="off"
+          />
+          <span className={styles.iconRight} onClick={() => setIsOpen((prev) => !prev)}>
+            {/* Стрелка вниз SVG */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
         {isOpen && filteredOptions.length > 0 && (
           <motion.div {...optionsListAnimation} className={styles.optionsList}>
             {filteredOptions.map((option) => (

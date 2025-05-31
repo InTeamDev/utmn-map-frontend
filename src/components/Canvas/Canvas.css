@@ -25,11 +25,11 @@
   flex-direction: column;
   gap: 12px;
   z-index: 10;
-  background-color: var(--dropdown-bg);
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border-color);
+  /* Удаляем фон и рамки */
+  background: none;
+  padding: 0;
+  border: none;
+  box-shadow: none;
 }
 
 /* Улучшенные стили для кнопок */

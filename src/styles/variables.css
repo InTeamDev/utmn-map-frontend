@@ -1,45 +1,18 @@
 :root {
-  /* Solarized Light */
-  --background-color: #fdf7e3; /* Base3 */
-  --text-color: #658b83; /* Base00 */
-  --primary-color: #269bd2; /* Blue */
-  --secondary-color: #3aa198; /* Cyan */
-  --label-color: #587e75; /* Base01 */
-  --input-focus-border: #b58901; /* Yellow */
-  --button-bg: #b58901; /* Yellow */
-  --button-bg-hover: #cb5b16; /* Orange */
-  --button-text: #fdf7e3; /* Base3 */
+  --background-color: #ffffff;
+  --text-color: #4b4b4b;
+  --primary-color: #4b4b4b;
+  --secondary-color: #3aa198;
+  --label-color: #4b4b4b;
+  --input-focus-border: #4b4b4b;
+  --button-bg: #e0e0e0;
+  --button-bg-hover: #d0d0d0;
+  --button-text: #4b4b4b;
+  --button-text-active: #e0e0e0;
   --error-color: #dc323f;
-  --dropdown-bg: #fdf7e3; /* Фон dropdown */
-  --border-color: #94a1a1; /* Цвет рамки */
-  --button-text-active: #eee;
-  --tooltip-bg: #fdf7e3; /* Base3 */
-  --tooltip-text: #658b83;
-  --background-color: #fdf6e3;
-  --text-color: #657b83;
+  --dropdown-bg: #e0e0e0;
+  --border-color: #c0c0c0;
+  --tooltip-bg: #ffffff;
+  --tooltip-text: #4b4b4b;
   --header-height: 60px;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    /* Solarized Light */
-    --background-color: #fdf7e3; /* Base3 */
-    --text-color: #658b83; /* Base00 */
-    --primary-color: #269bd2; /* Blue */
-    --secondary-color: #3aa198; /* Cyan */
-    --label-color: #587e75; /* Base01 */
-    --input-focus-border: #b58901; /* Yellow */
-    --button-bg: #b58901; /* Yellow */
-    --button-bg-hover: #cb5b16; /* Orange */
-    --button-text: #fdf7e3; /* Base3 */
-    --error-color: #dc323f;
-    --dropdown-bg: #fdf7e3; /* Фон dropdown */
-    --border-color: #94a1a1; /* Цвет рамки */
-    --button-text-active: #eee;
-    --tooltip-bg: #fdf7e3; /* Base3 */
-    --tooltip-text: #658b83;
-    --background-color: #fdf6e3;
-    --text-color: #657b83;
-    --header-height: 60px;
-  }
 }

@@ -132,8 +132,22 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    canvas.width = window.innerWidth * 0.8
-    canvas.height = window.innerHeight * 0.6
+    const dpr = window.devicePixelRatio || 1
+    const cssWidth = window.innerWidth
+    const cssHeight = window.innerHeight
+    canvas.width = cssWidth * dpr
+    canvas.height = cssHeight * dpr
+    canvas.style.width = cssWidth + 'px'
+    canvas.style.height = cssHeight + 'px'
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.scale(dpr, dpr)
+    }
+    // Сброс трансформаций после resize
+    transformState.current.offset = { x: 0, y: 0 }
+    transformState.current.scale = 1
+    setScaleValue(1)
     if (currentFloor) drawFloor(currentFloor)
   }, [currentFloor, drawFloor])
 

@@ -10,8 +10,6 @@ import { BuildingData } from '../../services/interface/map-object'
 
 const HomePage: React.FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>()
-  const [from, setFrom] = useState<string | null>(null)
-  const [to, setTo] = useState<string | null>(null)
   const [currentFloor, setCurrentFloor] = useState('Floor_First')
   const [locations, setLocations] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
@@ -88,9 +86,8 @@ const HomePage: React.FC = () => {
   )
 
   const handleLocationChange = useCallback(
-    (value: string | null, setter: (value: string | null) => void) => {
+    (value: string | null) => {
       if (!value) return
-      setter(value)
 
       const floor = `Floor_${value.split('_')[1]}`
       if (floor !== currentFloor) {
@@ -110,18 +107,8 @@ const HomePage: React.FC = () => {
         {error && <Error message={error} />}
 
         <div className={styles.dropdownContainer}>
-          {to && (
-            <Dropdown
-              options={locationOptions}
-              placeholder="Откуда?"
-              onChange={(value) => handleLocationChange(value, setFrom)}
-            />
-          )}
-          <Dropdown
-            options={locationOptions}
-            placeholder="Куда?"
-            onChange={(value) => handleLocationChange(value, setTo)}
-          />
+          <Dropdown options={locationOptions} placeholder="Откуда?" onChange={(value) => handleLocationChange(value)} />
+          <Dropdown options={locationOptions} placeholder="Куда?" onChange={(value) => handleLocationChange(value)} />
         </div>
       </div>
 
