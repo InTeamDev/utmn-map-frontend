@@ -51,21 +51,48 @@
 /* Адаптация для мобильных устройств */
 @media (max-width: 668px) {
   .container {
-    padding: 8px;
+    padding: 0;
+    flex-direction: column;
+    margin-top: 0 !important;
+    overflow: visible !important;
   }
 
   .navigationPanel {
-    flex-direction: column; /* На мобильных устройствах элементы располагаются вертикально */
+    flex-direction: column;
+    width: 100vw;
+    height: auto;
+    min-height: 0;
+    max-width: 100vw;
+    background: var(--background-color);
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 4px;
     gap: 8px;
-  }
-
-  .buildingDropdownContainer {
-    margin-left: 0; /* Убираем отступ на мобильных устройствах */
+    align-items: stretch;
+    overflow-x: visible;
+    overflow-y: visible;
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
 
   .dropdownContainer {
-    width: fit-content; /* или max-content */
-    pointer-events: auto;
+    flex-direction: column;
+    width: 100vw;
+    gap: 8px;
+    margin-top: 0;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .buildingDropdownContainer {
+    margin-left: 0;
+  }
+
+  .canvas-container {
+    margin-top: 96px !important;
   }
 
   .content {

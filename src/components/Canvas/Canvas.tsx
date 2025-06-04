@@ -317,11 +317,99 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
     const off = setupCanvasEvents()
+
+    // === PINCH-TO-ZOOM ===
+    const canvas = canvasRef.current
+    let lastTouchDist: number | null = null
+    let lastScale = 1
+    let lastTouchCenter: { x: number; y: number } | null = null
+    let isTouchDragging = false
+    let lastTouchPos: { x: number; y: number } | null = null
+    function getTouchDist(e: TouchEvent) {
+      const a = e.touches[0]
+      const b = e.touches[1]
+      const dx = a.clientX - b.clientX
+      const dy = a.clientY - b.clientY
+      return Math.sqrt(dx * dx + dy * dy)
+    }
+    function getTouchCenter(e: TouchEvent) {
+      const a = e.touches[0]
+      const b = e.touches[1]
+      return {
+        x: (a.clientX + b.clientX) / 2,
+        y: (a.clientY + b.clientY) / 2,
+      }
+    }
+    function handleTouchStart(e: TouchEvent) {
+      if (e.touches.length === 2) {
+        lastTouchDist = getTouchDist(e)
+        lastScale = transformState.current.scale
+        lastTouchCenter = getTouchCenter(e)
+      } else if (e.touches.length === 1) {
+        isTouchDragging = true
+        lastTouchPos = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      }
+    }
+    function handleTouchMove(e: TouchEvent) {
+      if (e.touches.length === 2 && lastTouchDist && lastTouchCenter) {
+        e.preventDefault()
+        const newDist = getTouchDist(e)
+        const newCenter = getTouchCenter(e)
+        let scale = lastScale * (newDist / lastTouchDist)
+        scale = Math.max(0.1, Math.min(10, scale))
+        // Корректируем offset так, чтобы центр pinch оставался на месте
+        const canvas = canvasRef.current
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect()
+          const prevScale = transformState.current.scale
+          // координаты центра pinch относительно canvas
+          const cx = newCenter.x - rect.left
+          const cy = newCenter.y - rect.top
+          // offset относительно нового масштаба
+          transformState.current.offset.x =
+            cx - ((cx - transformState.current.offset.x) / prevScale) * scale
+          transformState.current.offset.y =
+            cy - ((cy - transformState.current.offset.y) / prevScale) * scale
+        }
+        transformState.current.scale = scale
+        setScaleValue(scale)
+        if (currentFloor) drawFloor(currentFloor)
+      } else if (e.touches.length === 1 && isTouchDragging && lastTouchPos) {
+        e.preventDefault()
+        const touch = e.touches[0]
+        const dx = touch.clientX - lastTouchPos.x
+        const dy = touch.clientY - lastTouchPos.y
+        transformState.current.offset.x += dx
+        transformState.current.offset.y += dy
+        lastTouchPos = { x: touch.clientX, y: touch.clientY }
+        if (currentFloor) drawFloor(currentFloor)
+      }
+    }
+    function handleTouchEnd(e: TouchEvent) {
+      if (e.touches.length < 2) {
+        lastTouchDist = null
+        lastTouchCenter = null
+      }
+      if (e.touches.length === 0) {
+        isTouchDragging = false
+        lastTouchPos = null
+      }
+    }
+    if (canvas) {
+      canvas.addEventListener('touchstart', handleTouchStart, { passive: false })
+      canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+      canvas.addEventListener('touchend', handleTouchEnd)
+    }
     return () => {
       window.removeEventListener('resize', resizeCanvas)
       off?.()
+      if (canvas) {
+        canvas.removeEventListener('touchstart', handleTouchStart)
+        canvas.removeEventListener('touchmove', handleTouchMove)
+        canvas.removeEventListener('touchend', handleTouchEnd)
+      }
     }
-  }, [resizeCanvas, setupCanvasEvents])
+  }, [resizeCanvas, setupCanvasEvents, currentFloor, drawFloor])
 
   const handleFloorChange = useCallback(
     (floor: string) => {

@@ -15,6 +15,7 @@ const HomePage: React.FC = () => {
   const [locations, setLocations] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [showHeader, setShowHeader] = useState(true)
 
   const locationOptions = useMemo(() => {
     if (!Object.keys(locations).length) return []
@@ -98,13 +99,22 @@ const HomePage: React.FC = () => {
     [currentFloor, handleFloorChange],
   )
 
+  useEffect(() => {
+    function handleResize() {
+      setShowHeader(window.innerWidth > 668)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   if (isLoading) {
     return <LoadingScreen />
   }
 
   return (
     <>
-      <Header />
+      {showHeader && <Header />}
       <div className={styles.container}>
         <div className={styles.navigationPanel}>
           {error && <Error message={error} />}

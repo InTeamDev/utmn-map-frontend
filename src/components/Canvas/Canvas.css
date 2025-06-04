@@ -216,3 +216,12 @@
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
+
+@media (max-width: 668px) {
+  .floor-buttons {
+    left: 20px;
+    right: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
