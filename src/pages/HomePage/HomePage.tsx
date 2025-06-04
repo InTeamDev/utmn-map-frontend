@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
     return Object.entries(locations)
       .filter(([key, value]) => {
         const hasValidAlias = value && !value.includes('???')
-        const isNotIDK = !key.includes('IDK')
+        const isNotIDK = !key.includes('IDK') && !value.includes('IDK')
         const isNotStairs = !key.includes('Stairs')
         return hasValidAlias && isNotIDK && isNotStairs
       })

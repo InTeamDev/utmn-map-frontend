@@ -101,6 +101,9 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       if (!canvas || !buildingData) return
       const ctx = canvas.getContext('2d')
       if (!ctx) return
+    
+      const rect = canvas.getBoundingClientRect()
+      ctx.clearRect(0, 0, rect.width, rect.height)
 
       const { offset, scale } = transformState.current
       const floor = buildingData.objects.floors.find((f) => f.floor.name === floorName)
@@ -141,6 +144,18 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         ctx.lineWidth = 1
         ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
 
+        switch (obj.name) {
+          case 'Гардероб':
+            obj.object_type = 'wardrobe'
+            break
+          case 'Dining':
+            obj.object_type = 'cafeteria'
+            break
+          case 'Кухня':
+            obj.object_type = 'kitchen'
+            break
+        }
+
         // Для кабинетов - текст по центру
         if (type === 'cabinet') {
           ctx.fillStyle = '#000000'
@@ -150,7 +165,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
           ctx.fillText(obj.name || '???', obj.x + obj.width / 2, obj.y + obj.height / 2)
         } else {
           // Для остальных объектов - иконки
-          const icon = OBJECT_ICONS[type]
+          const icon = getObjectIcon(obj.object_type)
           if (icon) {
             if (iconCache[icon]) {
               ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 24, 24)
@@ -204,15 +219,30 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
   const setupCanvasEvents = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+  
+    const getMouseCoords = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const sx = canvas.width / rect.width
+      const sy = canvas.height / rect.height
+      const px = (e.clientX - rect.left) * sx
+      const py = (e.clientY - rect.top) * sy
+      const { offset, scale } = transformState.current
+      const mx = (px - offset.x) / scale
+      const my = (py - offset.y) / scale
+      return { mx, my }
+    }
+  
     const mouseDown = (e: MouseEvent) => {
       if (mode === 'select') {
         transformState.current.isDragging = true
         transformState.current.lastPosition = { x: e.clientX, y: e.clientY }
       }
     }
+  
     const mouseUp = () => {
       transformState.current.isDragging = false
     }
+  
     const mouseMove = (e: MouseEvent) => {
       if (mode === 'select' && transformState.current.isDragging) {
         const dx = e.clientX - transformState.current.lastPosition.x
@@ -223,6 +253,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         if (currentFloor) drawFloor(currentFloor)
       }
     }
+  
     const wheel = (e: WheelEvent) => {
       if (mode === 'select') {
         e.preventDefault()
@@ -231,64 +262,72 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
         const prev = transformState.current.scale
-        transformState.current.scale = e.deltaY < 0 ? prev * factor : prev / factor
+        let newScale = e.deltaY < 0 ? prev * factor : prev / factor
+        newScale = Math.max(0.2, Math.min(10, newScale))
+        transformState.current.scale = newScale
         transformState.current.offset.x =
-          x - ((x - transformState.current.offset.x) / prev) * transformState.current.scale
+          x - ((x - transformState.current.offset.x) / prev) * newScale
         transformState.current.offset.y =
-          y - ((y - transformState.current.offset.y) / prev) * transformState.current.scale
-        setScaleValue(transformState.current.scale)
+          y - ((y - transformState.current.offset.y) / prev) * newScale
+        setScaleValue(newScale)
         if (currentFloor) drawFloor(currentFloor)
       }
     }
+  
     const click = (e: MouseEvent) => {
-      const c = canvasRef.current!
-      const rect = c.getBoundingClientRect()
-      const sx = c.width / rect.width
-      const sy = c.height / rect.height
-      const px = (e.clientX - rect.left) * sx
-      const py = (e.clientY - rect.top) * sy
-      const { offset, scale } = transformState.current
-      const mx = (px - offset.x) / scale
-      const my = (py - offset.y) / scale
-      if (mode === 'select') {
-        const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
-        const found = objs.find((o) => mx >= o.x && mx <= o.x + o.width && my >= o.y && my <= o.y + o.height)
-        if (found)
-          setSelectedObject({
-            name: found.name || 'Unnamed',
-            alias: found.alias || '',
-            description: found.description || '',
-            type: found.object_type,
-            position: { x: found.x, y: found.y },
-          })
-        else setSelectedObject(undefined)
-      }
-      if (mode === 'create') {
-        const c = canvasRef.current!
-        const rect = c.getBoundingClientRect()
-        const sx = c.width / rect.width
-        const sy = c.height / rect.height
-        const px = (e.clientX - rect.left) * sx
-        const py = (e.clientY - rect.top) * sy
-        const { offset, scale } = transformState.current
-        const mx = (px - offset.x) / scale
-        const my = (py - offset.y) / scale
-
-        setNewObjectPosition({ x: mx, y: my })
-        setCreationModalOpen(true)
-      }
-      if (mode === 'route') {
-        // TODO: dp route point
-      }
-      if (mode === 'polygon') {
-        // TODO: dp polygon point
+      const { mx, my } = getMouseCoords(e)
+  
+      switch (mode) {
+        case 'select': {
+          const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
+          const found = objs.find(
+            (o) =>
+              mx >= o.x &&
+              mx <= o.x + o.width &&
+              my >= o.y &&
+              my <= o.y + o.height
+          )
+          if (found) {
+            setSelectedObject({
+              name: found.name || 'Unnamed',
+              alias: found.alias || '',
+              description: found.description || '',
+              type: found.object_type,
+              position: { x: found.x, y: found.y },
+            })
+          } else {
+            setSelectedObject(undefined)
+          }
+          break
+        }
+  
+        case 'create': {
+          setNewObjectPosition({ x: mx, y: my })
+          setCreationModalOpen(true)
+          break
+        }
+  
+        case 'route': {
+          // TODO: добавить точку маршрута
+          break
+        }
+  
+        case 'polygon': {
+          // TODO: добавить точку полигона
+          break
+        }
+  
+        default:
+          break
       }
     }
+  
     canvas.addEventListener('mousedown', mouseDown)
     canvas.addEventListener('mouseup', mouseUp)
     canvas.addEventListener('mousemove', mouseMove)
     canvas.addEventListener('wheel', wheel, { passive: false })
     canvas.addEventListener('click', click)
+  
     return () => {
       canvas.removeEventListener('mousedown', mouseDown)
       canvas.removeEventListener('mouseup', mouseUp)
@@ -297,6 +336,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       canvas.removeEventListener('click', click)
     }
   }, [mode, buildingData, currentFloor, drawFloor])
+  
 
   const handleCreateObject = async (data: NewObject) => {
     try {
@@ -356,7 +396,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         const newDist = getTouchDist(e)
         const newCenter = getTouchCenter(e)
         let scale = lastScale * (newDist / lastTouchDist)
-        scale = Math.max(0.1, Math.min(10, scale))
+        scale = Math.max(0.2, Math.min(10, scale))
         // Корректируем offset так, чтобы центр pinch оставался на месте
         const canvas = canvasRef.current
         if (canvas) {
@@ -419,13 +459,13 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     [drawFloor],
   )
   const handleZoomIn = useCallback(() => {
-    const ns = transformState.current.scale + 0.1
+    const ns = Math.min(10, transformState.current.scale + 0.1)
     transformState.current.scale = ns
     setScaleValue(ns)
     if (currentFloor) drawFloor(currentFloor)
   }, [currentFloor, drawFloor])
   const handleZoomOut = useCallback(() => {
-    const ns = Math.max(0.1, transformState.current.scale - 0.1)
+    const ns = Math.max(0.2, transformState.current.scale - 0.1)
     transformState.current.scale = ns
     setScaleValue(ns)
     if (currentFloor) drawFloor(currentFloor)
@@ -436,6 +476,18 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     setScaleValue(1)
     if (currentFloor) drawFloor(currentFloor)
   }, [currentFloor, drawFloor])
+
+  // Функция выбора иконки по строгому типу
+  const getObjectIcon = (type: string) => {
+    const t = type.toLowerCase();
+    if (t === 'wardrobe') return WardrobeIcon;
+    if (t === 'kitchen') return KitchenIcon;
+    if (t === 'cafeteria' || t === 'dining') return CafeteriaIcon;
+    if (t === 'gym') return GymIcon;
+    if (t === 'man-toilet') return ManToiletIcon;
+    if (t === 'woman-toilet') return WomanToiletIcon;
+    return '';
+  };
 
   if (!buildingData) return <div>Loading...</div>
 
