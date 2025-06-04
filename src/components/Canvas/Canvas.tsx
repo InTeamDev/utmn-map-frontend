@@ -15,12 +15,13 @@ import CafeteriaIcon from '../../assets/cafeteria.svg'
 import GymIcon from '../../assets/gym.svg'
 import ManToiletIcon from '../../assets/man-toilet.svg'
 import WomanToiletIcon from '../../assets/woman-toilet.svg'
+import StairIcon from '../../assets/stair.svg'
 
 // Типы для режимов работы
 export type Mode = 'select' | 'create' | 'move' | 'route' | 'polygon'
 
 // Типы для объектов на карте
-type ObjectType = 'cabinet' | 'wardrobe' | 'woman-toilet' | 'man-toilet' | 'gym' | 'kitchen' | 'cafeteria'
+type ObjectType = 'cabinet' | 'wardrobe' | 'woman-toilet' | 'man-toilet' | 'gym' | 'kitchen' | 'cafeteria' | 'stair'
 
 const OBJECT_COLORS: Record<ObjectType, string> = {
   cabinet: '#C9E6FA',
@@ -30,16 +31,7 @@ const OBJECT_COLORS: Record<ObjectType, string> = {
   gym: '#C9E6FA',
   kitchen: '#C9E6FA',
   cafeteria: '#C9E6FA',
-}
-
-const OBJECT_ICONS: Record<ObjectType, string> = {
-  cabinet: '',
-  wardrobe: WardrobeIcon,
-  'woman-toilet': WomanToiletIcon,
-  'man-toilet': ManToiletIcon,
-  gym: GymIcon,
-  kitchen: KitchenIcon,
-  cafeteria: CafeteriaIcon,
+  stair: '#C9E6FA',
 }
 
 const DEFAULT_OBJECT_COLOR = '#C9E6FA'
@@ -144,6 +136,10 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         ctx.lineWidth = 1
         ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
 
+        if (obj.object_type === 'stair') {
+          console.log(obj)
+        }
+
         switch (obj.name) {
           case 'Гардероб':
             obj.object_type = 'wardrobe'
@@ -168,12 +164,11 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
           const icon = getObjectIcon(obj.object_type)
           if (icon) {
             if (iconCache[icon]) {
-              ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 24, 24)
+              ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 30, 30)
             } else {
               const img = new window.Image()
               img.onload = () => {
                 iconCache[icon] = img
-                // Перерисовать canvas после загрузки иконки
                 if (currentFloor) drawFloor(currentFloor)
               }
               img.src = icon
@@ -477,6 +472,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     if (t === 'gym') return GymIcon
     if (t === 'man-toilet') return ManToiletIcon
     if (t === 'woman-toilet') return WomanToiletIcon
+    if (t === 'stair') return StairIcon
     return ''
   }
 
