@@ -164,7 +164,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
           const icon = getObjectIcon(obj.object_type)
           if (icon) {
             if (iconCache[icon]) {
-              ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 30, 30)
+              ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 28, 28)
             } else {
               const img = new window.Image()
               img.onload = () => {
