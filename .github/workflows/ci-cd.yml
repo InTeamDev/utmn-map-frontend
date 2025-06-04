@@ -1,20 +1,25 @@
-name: CI/CD Pipeline
+name: Build and Deploy React Frontend
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  lint:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -22,28 +27,28 @@ jobs:
           node-version: 23
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm ci
 
-      - name: Run ESLint
-        run: npx eslint src --max-warnings=1000 || true
+      - name: Build React app
+        run: |
+          npm run build
 
-  build-and-test:
-    runs-on: ubuntu-latest
-    needs: lint
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # 7. Добавляем сервер в known_hosts, чтобы не вводить вручную подтверждение
+      - name: Add host to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 23
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        env:
-          DISABLE_ESLINT_PLUGIN: true
-        run: npm run build
+      # 8. Синхронизируем собранную папку build/ на сервер
+      - name: Rsync React build to remote server
+        run: |
+          rsync -avz --delete \
+            --exclude='.git*' \
+            build/ \
+            ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.FRONTEND_PATH }}
