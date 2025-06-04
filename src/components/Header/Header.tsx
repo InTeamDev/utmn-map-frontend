@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ title = '', showLogOut = false }) => {
     <header className={styles.header}>
       <div className={styles.left}>
         <img src={logo} alt="Logo" className={styles.logo} />
-        <h1>{title}</h1>
+        <h1 className={styles.title}>{title}</h1>
       </div>
       {showLogOut && (
         <>

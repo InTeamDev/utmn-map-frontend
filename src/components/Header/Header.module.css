@@ -22,6 +22,9 @@
   width: auto;
   margin-right: 0;
 }
+.title {
+  color: #0f3f60;
+}
 .logout-button {
   margin-left: auto;
   background: #fff;
@@ -43,4 +46,3 @@
   color: #0077b6;
   border-color: #0077b6;
 }
-

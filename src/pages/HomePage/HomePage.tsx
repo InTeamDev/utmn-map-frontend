@@ -114,7 +114,7 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      {showHeader && <Header />}
+      {showHeader && <Header title="UTMN MAP" />}
       <div className={styles.container}>
         <div className={styles.navigationPanel}>
           {error && <Error message={error} />}
