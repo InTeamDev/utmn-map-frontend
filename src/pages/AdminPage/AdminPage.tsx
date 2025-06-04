@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AdminHeader from '../../components/AdminHeader/AdminHeader'
 import CreateBuildingModal from '../../components/CreateBuildingModal/CreateBuildingModal'
 import { api } from '../../services/public.api'
 import { useAuth } from '../../services/auth/AuthContext'
 import { Building } from '../../services/interface/building'
 import './AdminPage.css'
+import Header from '../../components/Header/Header'
 
 const AdminPage: React.FC = () => {
   const { logout } = useAuth()
@@ -42,7 +42,7 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="admin-page">
-      <AdminHeader title="Админ-панель" />
+      <Header title="Админ-панель" showLogOut={true} />
       <main className="admin-content">
         {loading && <p>Загрузка строений...</p>}
         {error && <p className="error-message">{error}</p>}

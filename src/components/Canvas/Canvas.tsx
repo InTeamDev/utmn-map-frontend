@@ -8,21 +8,44 @@ import { FloorButtons } from './FloorBtns/FloorBtns'
 import { InfoBox } from './InfoBox/InfoBox'
 import { ScaleControls } from './Scale/ScaleControl'
 
+// Иконки для объектов
+import WardrobeIcon from '../../assets/wardrobe.svg'
+import KitchenIcon from '../../assets/kitchen.svg'
+import CafeteriaIcon from '../../assets/cafeteria.svg'
+import GymIcon from '../../assets/gym.svg'
+import ManToiletIcon from '../../assets/man-toilet.svg'
+import WomanToiletIcon from '../../assets/woman-toilet.svg'
+
 // Типы для режимов работы
 export type Mode = 'select' | 'create' | 'move' | 'route' | 'polygon'
-// Типы для объектов на карте
 
-type ObjectType = 'cabinet' | 'wardrobe' | 'woman-toilet' | 'man-toilet' | 'gym'
+// Типы для объектов на карте
+type ObjectType = 'cabinet' | 'wardrobe' | 'woman-toilet' | 'man-toilet' | 'gym' | 'kitchen' | 'cafeteria'
 
 const OBJECT_COLORS: Record<ObjectType, string> = {
-  cabinet: 'rgba(0,128,255,1)',
-  wardrobe: 'rgba(255,165,0,0.5)',
-  'woman-toilet': 'rgba(255,192,203,0.5)',
-  'man-toilet': 'rgba(144,238,144,0.5)',
-  gym: 'rgba(128,0,128,0.5)',
+  cabinet: '#C9E6FA',
+  wardrobe: '#C9E6FA',
+  'woman-toilet': '#C9E6FA',
+  'man-toilet': '#C9E6FA',
+  gym: '#C9E6FA',
+  kitchen: '#C9E6FA',
+  cafeteria: '#C9E6FA',
 }
 
-const DEFAULT_OBJECT_COLOR = 'rgba(200,200,200,0.5)'
+const OBJECT_ICONS: Record<ObjectType, string> = {
+  cabinet: '',
+  wardrobe: WardrobeIcon,
+  'woman-toilet': WomanToiletIcon,
+  'man-toilet': ManToiletIcon,
+  gym: GymIcon,
+  kitchen: KitchenIcon,
+  cafeteria: CafeteriaIcon,
+}
+
+const DEFAULT_OBJECT_COLOR = '#C9E6FA'
+
+// Глобальный кэш для иконок
+const iconCache: Record<string, HTMLImageElement> = {}
 
 interface InteractiveCanvasProps {
   showPanel?: boolean
@@ -71,7 +94,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     })()
   }, [buildingId])
 
-  // Отрисовка этажа
+  // Отрисовка этажа с улучшенным стилем
   const drawFloor = useCallback(
     (floorName: string) => {
       const canvas = canvasRef.current
@@ -88,21 +111,6 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       ctx.translate(offset.x, offset.y)
       ctx.scale(scale, scale)
 
-      floor.objects.forEach((obj) => {
-        const type = obj.object_type as ObjectType
-        ctx.fillStyle = OBJECT_COLORS[type] || DEFAULT_OBJECT_COLOR
-        ctx.fillRect(obj.x, obj.y, obj.width, obj.height)
-        ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
-        ctx.fillStyle = 'black'
-        ctx.font = '14px Arial'
-        ctx.fillText(obj.name || '???', obj.x + 5, obj.y + 15)
-        obj.doors?.forEach((door) => {
-          ctx.fillStyle = 'red'
-          ctx.fillRect(door.x, door.y, door.width, door.height)
-          ctx.strokeRect(door.x, door.y, door.width, door.height)
-        })
-      })
-
       // Отрисовка background (если есть)
       if (floor.background && floor.background.length > 0) {
         floor.background.forEach((bg) => {
@@ -116,17 +124,59 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
             ctx.lineTo(p.x, p.y)
           }
           ctx.closePath()
-          ctx.fillStyle = 'rgba(200, 200, 200, 0.3)' // цвет и прозрачность фона
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
           ctx.fill()
-          ctx.strokeStyle = 'rgba(150, 150, 150, 0.8)' // контур
+          ctx.strokeStyle = 'rgba(200, 200, 200, 0.8)'
+          ctx.lineWidth = 2
           ctx.stroke()
         })
       }
 
+      // Отрисовка объектов
+      floor.objects.forEach((obj) => {
+        const type = obj.object_type as ObjectType
+        ctx.fillStyle = OBJECT_COLORS[type] || DEFAULT_OBJECT_COLOR
+        ctx.fillRect(obj.x, obj.y, obj.width, obj.height)
+        ctx.strokeStyle = '#A0C4E0'
+        ctx.lineWidth = 1
+        ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
+
+        // Для кабинетов - текст по центру
+        if (type === 'cabinet') {
+          ctx.fillStyle = '#000000'
+          ctx.font = '18px Arial, sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(obj.name || '???', obj.x + obj.width / 2, obj.y + obj.height / 2)
+        } else {
+          // Для остальных объектов - иконки
+          const icon = OBJECT_ICONS[type]
+          if (icon) {
+            if (iconCache[icon]) {
+              ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 24, 24)
+            } else {
+              const img = new window.Image()
+              img.onload = () => {
+                iconCache[icon] = img
+                // Перерисовать canvas после загрузки иконки
+                if (currentFloor) drawFloor(currentFloor)
+              }
+              img.src = icon
+            }
+          }
+        }
+
+        // Отрисовка дверей
+        obj.doors?.forEach((door) => {
+          ctx.fillStyle = '#FF6B6B'
+          ctx.fillRect(door.x, door.y, door.width, door.height)
+          ctx.strokeStyle = '#FF0000'
+          ctx.strokeRect(door.x, door.y, door.width, door.height)
+        })
+      })
+
       ctx.restore()
-    },
-    [buildingData],
-  )
+    }, [buildingData, currentFloor])
 
   // resize и обработчики
   const resizeCanvas = useCallback(() => {
@@ -388,7 +438,12 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       )}
 
       {/* Масштаб */}
-      <ScaleControls scale={scaleValue} onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} onResetScale={handleResetScale} />
+      <ScaleControls
+        scale={scaleValue}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onResetScale={handleResetScale}
+      />
     </div>
   )
 }

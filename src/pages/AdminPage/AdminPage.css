@@ -1,19 +1,19 @@
+body {
+  margin: 0;
+  padding: 0;
+}
 .admin-page {
-  display: flex;
-  flex-direction: column;
+  padding-top: 48px;
   min-height: 100vh;
-  background: var(--background-color);
-  color: var(--text-color);
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .admin-content {
-  flex: 1;
   padding: 2rem;
-  margin: 48px 2rem 2rem 2rem;
-  background: var(--dropdown-bg);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin: 0 auto;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .buildings-board {

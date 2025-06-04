@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom'
 import { api } from '../../services/public.api'
 import { useAuth } from '../../services/auth/AuthContext'
 import { Building, BuildingsResponse } from '../../services/interface/building'
-import '../AdminPage/AdminPage.css'
-import AdminHeader from '../../components/AdminHeader/AdminHeader'
+import './AdminBuildingPage.css'
 import InteractiveCanvas from '../../components/Canvas/Canvas'
+import Header from '../../components/Header/Header'
 
 const BuildingDetails: React.FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>()
@@ -42,19 +42,11 @@ const BuildingDetails: React.FC = () => {
   }, [buildingId])
 
   return (
-    <div className="admin-page">
-      <AdminHeader title={building ? `Редактирование ${building.name}, Адрес: ${building.address}` : 'Загрузка...'} />
-
-      <main className="admin-content">
-        {loading && <p>Загрузка информации о строении...</p>}
-        {error && <p className="error-message">{error}</p>}
-
-        {building && (
-          <div className="objects-section">
-            <InteractiveCanvas showPanel={true} showEditBtns={true} />
-          </div>
-        )}
-      </main>
+    <div className="admin-building-page-container">
+      <Header title={building ? `Редактирование ${building.name}, Адрес: ${building.address}` : 'Загрузка...'} />
+      {loading && <p>Загрузка информации о строении...</p>}
+      {error && <p className="error-message">{error}</p>}
+      {building && <InteractiveCanvas showPanel={true} showEditBtns={true} />}
     </div>
   )
 }
