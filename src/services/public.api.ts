@@ -1,10 +1,7 @@
-import { NewObject } from '../components/Canvas/CreateObjectModal/CreateObjectModal'
-import { cacheService } from './cacheService'
-import { Building, BuildingsResponse } from './interface/building'
-import { Category } from './interface/category'
-import { Floor } from './interface/floor'
-import { BuildingData } from './interface/map-object'
-import { MapPath } from './interface/map-path'
+import { Building, BuildingsResponse } from './interfaces/building'
+import { Floor } from './interfaces/floor'
+import { Door, GetObjectsResponse, Object, ObjectTypeInfo, SearchResult } from './interfaces/object'
+import { BuildRouteRequest, Connection, Intersection, Node } from './interfaces/route'
 
 declare const process: {
   env: {
@@ -23,108 +20,76 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export const api = {
   async getBuildings(): Promise<BuildingsResponse> {
-    const cacheKey = 'buildings'
-    const cachedData = cacheService.get<BuildingsResponse>(cacheKey)
-    if (cachedData) return cachedData
-
     const response = await fetch(`${API_BASE_URL}/api/buildings`)
     const data = await handleResponse<BuildingsResponse>(response)
-    cacheService.set(cacheKey, data)
     return data
   },
 
-  async createBuilding(building: { name: string; address: string; description: string }): Promise<Building> {
-    const response = await fetch(`${API_BASE_URL}/api/buildings`, {
+  async getBuilding(buildingId: string): Promise<Building> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}`)
+    return handleResponse<Building>(response)
+  },
+
+  async getFloors(buildingId: string): Promise<{ floors: Floor[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/floors`)
+    const data = await handleResponse<{ floors: Floor[] }>(response)
+    return data
+  },
+
+  async getObjects(buildingId: string): Promise<GetObjectsResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/objects`)
+    const data = await handleResponse<GetObjectsResponse>(response)
+    return data
+  },
+
+  async getObject(buildingId: string, objectId: string): Promise<Object> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/objects/${objectId}`)
+    return handleResponse<Object>(response)
+  },
+
+  async getDoors(buildingId: string): Promise<{ doors: Door[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/doors`)
+    return handleResponse<{ doors: Door[] }>(response)
+  },
+
+  async getIntersections(buildingId: string): Promise<{ intersections: Intersection[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/intersections`)
+    return handleResponse<{ intersections: Intersection[] }>(response)
+  },
+
+  async getConnections(buildingId: string): Promise<{ connections: Connection[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/connections`)
+    return handleResponse<{ connections: Connection[] }>(response)
+  },
+
+  async getGraphNodes(buildingId: string): Promise<{ nodes: Node[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/graph/nodes`)
+    return handleResponse<{ nodes: Node[] }>(response)
+  },
+
+  async buildRoute(buildingId: string, request: BuildRouteRequest): Promise<{ route: Connection[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/route`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(building),
+      body: JSON.stringify(request),
     })
-
-    if (!response.ok) {
-      throw new Error('Failed to create building')
-    }
-    return response.json()
+    return handleResponse<{ route: Connection[] }>(response)
   },
 
-  async createObject(data: NewObject): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/api/objects`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
+  async search(buildingId: string, query?: string, categories?: string[]): Promise<{ results: SearchResult[] }> {
+    const params = new URLSearchParams()
+    if (query) params.append('query', query)
+    if (categories) categories.forEach(cat => params.append('category', cat))
 
-    if (!response.ok) {
-      throw new Error('Failed to create object')
-    }
-    return response.json()
+    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/search?${params.toString()}`)
+    return handleResponse<{ results: SearchResult[] }>(response)
   },
 
-  async getFloors(buildId: string): Promise<Floor[]> {
-    const cacheKey = `floors-${buildId}`
-    const cachedData = cacheService.get<Floor[]>(cacheKey)
-    if (cachedData) return cachedData
-
-    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildId}/floors`)
-    const data = await handleResponse<Floor[]>(response)
-    cacheService.set(cacheKey, data)
-    return data
-  },
-
-  async getMapPath(buildId: string, fromId: string, toId: string): Promise<MapPath[]> {
-    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildId}/path?from=${fromId}&to=${toId}`)
-    if (!response.ok) throw new Error('Failed to fetch path')
-    return response.json()
-  },
-
-  // Получить объекты на этаже корпуса
-  async getObjectsByBuilding(buildId: string | undefined): Promise<BuildingData> {
-    const cacheKey = `objects-${buildId}`
-    const cachedData = cacheService.get<BuildingData>(cacheKey)
-    if (cachedData) return cachedData
-
-    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildId}/objects`)
-    const data = await handleResponse<BuildingData>(response)
-    cacheService.set(cacheKey, data)
-    return data
-  },
-
-  // Поиск объектов в корпусе
-  async search(buildId: string, query: string): Promise<BuildingData> {
-    const cacheKey = `search-${buildId}-${query}`
-    const cachedData = cacheService.get<BuildingData>(cacheKey)
-    if (cachedData) return cachedData
-
-    const response = await fetch(`${API_BASE_URL}/api/buildings/${buildId}/search?query=${encodeURIComponent(query)}`)
-    const data = await handleResponse<BuildingData>(response)
-    cacheService.set(cacheKey, data)
-    return data
-  },
-
-  // Получить все категории объектов
-  async getCategories(): Promise<Category[]> {
-    const cacheKey = 'categories'
-    const cachedData = cacheService.get<Category[]>(cacheKey)
-    if (cachedData) return cachedData
-
+  async getCategories(): Promise<{ categories: ObjectTypeInfo[] }> {
     const response = await fetch(`${API_BASE_URL}/api/categories`)
-    const data = await handleResponse<Category[]>(response)
-    cacheService.set(cacheKey, data)
+    const data = await handleResponse<{ categories: ObjectTypeInfo[] }>(response)
     return data
-  },
-
-  async getFloorPlan(floor: string, officeAId?: string, officeBId?: string): Promise<Blob> {
-    let url = `${API_BASE_URL}/floor-plan?floor=${floor}`
-
-    if (officeAId && officeBId) {
-      url += `&office_a_id=${officeAId}&office_b_id=${officeBId}&top_k=3`
-    }
-
-    const response = await fetch(url)
-    if (!response.ok) throw new Error('Failed to fetch floor plan')
-    return response.blob()
   },
 }

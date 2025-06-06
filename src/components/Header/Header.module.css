@@ -12,6 +12,48 @@
   left: 0;
   z-index: 100;
 }
+
+.headerContent {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitle {
+  color: #0f3f60;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.logoutButton {
+  background: #fff;
+  color: #0f3f60;
+  border: 2px solid #0f3f60;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoutButton:hover {
+  background: #0f3f60;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(15, 63, 96, 0.2);
+}
+
+.logoutButton:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 .left {
   display: flex;
   align-items: center;

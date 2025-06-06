@@ -9,9 +9,9 @@ import { useAuth, AuthProvider } from './services/auth/AuthContext'
 import BuildingDetails from './pages/BuildingPage/AdminBuildingPage'
 import BuildingsPage from './pages/BuildingsPage/BuildingsPage'
 
-const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth()
-  return isAuthenticated ? element : <Navigate to="/login" replace />
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />
 }
 
 const App: React.FC = () => {
@@ -21,9 +21,23 @@ const App: React.FC = () => {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<BuildingsPage />} />
-            <Route path="/building/:buildingId" element={<ProtectedRoute element={<HomePage />} />} />
-            <Route path="/admin" element={<ProtectedRoute element={<AdminPage />} />} />
-            <Route path="/admin/:buildingId" element={<ProtectedRoute element={<BuildingDetails />} />} />
+            <Route path="/building/:buildingId" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/:buildingId"
+              element={
+                <ProtectedRoute>
+                  <BuildingDetails />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
+import { adminApi } from '../../services/admin.api'
 import { api } from '../../services/public.api'
-import { BuildingData } from '../../services/interface/map-object'
+import { GetObjectsResponse, ObjectType, getObjectTypeById, OBJECT_TYPE_TO_ID } from '../../services/interfaces/object'
 import './Canvas.css'
 import { CreationModal, NewObject } from './CreateObjectModal/CreateObjectModal'
 import { FloorButtons } from './FloorBtns/FloorBtns'
@@ -20,18 +21,17 @@ import StairIcon from '../../assets/stair.svg'
 // Типы для режимов работы
 export type Mode = 'select' | 'create' | 'move' | 'route' | 'polygon'
 
-// Типы для объектов на карте
-type ObjectType = 'cabinet' | 'wardrobe' | 'woman-toilet' | 'man-toilet' | 'gym' | 'kitchen' | 'cafeteria' | 'stair'
-
 const OBJECT_COLORS: Record<ObjectType, string> = {
   cabinet: '#C9E6FA',
   wardrobe: '#C9E6FA',
   'woman-toilet': '#C9E6FA',
   'man-toilet': '#C9E6FA',
   gym: '#C9E6FA',
-  kitchen: '#C9E6FA',
-  cafeteria: '#C9E6FA',
+  cafe: '#C9E6FA',
+  canteen: '#C9E6FA',
   stair: '#C9E6FA',
+  department: '#C9E6FA',
+  'chill-zone': '#C9E6FA',
 }
 
 const DEFAULT_OBJECT_COLOR = '#C9E6FA'
@@ -47,7 +47,7 @@ interface InteractiveCanvasProps {
 const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false, showEditBtns = false }) => {
   const { buildingId } = useParams<{ buildingId: string }>()
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [buildingData, setBuildingData] = useState<BuildingData | null>(null)
+  const [buildingData, setBuildingData] = useState<GetObjectsResponse | null>(null)
   const [currentFloor, setCurrentFloor] = useState<string | null>(null)
   const [selectedObject, setSelectedObject] = useState<
     | {
@@ -77,8 +77,9 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     if (!buildingId) return
     ;(async () => {
       try {
-        const data = await api.getObjectsByBuilding(buildingId)
+        const data = await api.getObjects(buildingId)
         setBuildingData(data)
+        console.log(data)
         if (data.objects.floors.length > 0) setCurrentFloor(data.objects.floors[0].floor.name)
       } catch (err) {
         console.error(err)
@@ -128,62 +129,47 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       }
 
       // Отрисовка объектов
-      floor.objects.forEach((obj) => {
-        const type = obj.object_type as ObjectType
-        ctx.fillStyle = OBJECT_COLORS[type] || DEFAULT_OBJECT_COLOR
-        ctx.fillRect(obj.x, obj.y, obj.width, obj.height)
-        ctx.strokeStyle = '#A0C4E0'
-        ctx.lineWidth = 1
-        ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
+      floor.objects
+        .filter(obj => !obj.name.includes('IDK'))
+        .forEach((obj) => {
+          const type = getObjectTypeById(obj.object_type_id)
+          ctx.fillStyle = OBJECT_COLORS[type] || DEFAULT_OBJECT_COLOR
+          ctx.fillRect(obj.x, obj.y, obj.width, obj.height)
+          ctx.strokeStyle = '#A0C4E0'
+          ctx.lineWidth = 1
+          ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
 
-        if (obj.object_type === 'stair') {
-          console.log(obj)
-        }
-
-        switch (obj.name) {
-          case 'Гардероб':
-            obj.object_type = 'wardrobe'
-            break
-          case 'Dining':
-            obj.object_type = 'cafeteria'
-            break
-          case 'Кухня':
-            obj.object_type = 'kitchen'
-            break
-        }
-
-        // Для кабинетов - текст по центру
-        if (type === 'cabinet') {
-          ctx.fillStyle = '#000000'
-          ctx.font = '18px Arial, sans-serif'
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
-          ctx.fillText(obj.name || '???', obj.x + obj.width / 2, obj.y + obj.height / 2)
-        } else {
-          // Для остальных объектов - иконки
-          const icon = getObjectIcon(obj.object_type)
-          if (icon) {
-            if (iconCache[icon]) {
-              ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 28, 28)
-            } else {
-              const img = new window.Image()
-              img.onload = () => {
-                iconCache[icon] = img
-                if (currentFloor) drawFloor(currentFloor)
+          if (type === 'cabinet') {
+            ctx.fillStyle = '#000000'
+            ctx.font = '18px Arial, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(obj.name || '???', obj.x + obj.width / 2, obj.y + obj.height / 2)
+          } else {
+            // Для остальных объектов - иконки
+            const icon = getObjectIcon(type)
+            if (icon) {
+              if (iconCache[icon]) {
+                ctx.drawImage(iconCache[icon], obj.x + obj.width / 2 - 12, obj.y + obj.height / 2 - 12, 28, 28)
+              } else {
+                const img = new window.Image()
+                img.onload = () => {
+                  iconCache[icon] = img
+                  if (currentFloor) drawFloor(currentFloor)
+                }
+                img.src = icon
               }
-              img.src = icon
             }
           }
-        }
 
-        // Отрисовка дверей
-        obj.doors?.forEach((door) => {
-          ctx.fillStyle = '#FF6B6B'
-          ctx.fillRect(door.x, door.y, door.width, door.height)
-          ctx.strokeStyle = '#FF0000'
-          ctx.strokeRect(door.x, door.y, door.width, door.height)
+          // Отрисовка дверей
+          obj.doors?.forEach((door) => {
+            ctx.fillStyle = '#FF6B6B'
+            ctx.fillRect(door.x, door.y, door.width, door.height)
+            ctx.strokeStyle = '#FF0000'
+            ctx.strokeRect(door.x, door.y, door.width, door.height)
+          })
         })
-      })
 
       ctx.restore()
     },
@@ -281,7 +267,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
               name: found.name || 'Unnamed',
               alias: found.alias || '',
               description: found.description || '',
-              type: found.object_type,
+              type: getObjectTypeById(found.object_type_id),
               position: { x: found.x, y: found.y },
             })
           } else {
@@ -328,13 +314,12 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
 
   const handleCreateObject = async (data: NewObject) => {
     try {
-      await api.createObject({
+      if (!buildingId || !currentFloor) return
+      await adminApi.createObject(buildingId, currentFloor, {
         ...data,
-        floor: currentFloor,
-        buildingId: buildingId,
+        object_type_id: OBJECT_TYPE_TO_ID[data.type],
       })
-      // Обновление данных
-      const updatedData = await api.getObjectsByBuilding(buildingId)
+      const updatedData = await api.getObjects(buildingId)
       setBuildingData(updatedData)
     } catch (err) {
       console.error(err)
@@ -463,17 +448,26 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     if (currentFloor) drawFloor(currentFloor)
   }, [currentFloor, drawFloor])
 
-  // Функция выбора иконки по строгому типу
-  const getObjectIcon = (type: string) => {
-    const t = type.toLowerCase()
-    if (t === 'wardrobe') return WardrobeIcon
-    if (t === 'kitchen') return KitchenIcon
-    if (t === 'cafeteria' || t === 'dining') return CafeteriaIcon
-    if (t === 'gym') return GymIcon
-    if (t === 'man-toilet') return ManToiletIcon
-    if (t === 'woman-toilet') return WomanToiletIcon
-    if (t === 'stair') return StairIcon
-    return ''
+  // Функция выбора иконки по типу объекта
+  const getObjectIcon = (type: ObjectType) => {
+    switch (type) {
+      case 'wardrobe':
+        return WardrobeIcon
+      case 'cafe':
+        return KitchenIcon
+      case 'canteen':
+        return CafeteriaIcon
+      case 'gym':
+        return GymIcon
+      case 'man-toilet':
+        return ManToiletIcon
+      case 'woman-toilet':
+        return WomanToiletIcon
+      case 'stair':
+        return StairIcon
+      default:
+        return ''
+    }
   }
 
   if (!buildingData) return <div>Loading...</div>

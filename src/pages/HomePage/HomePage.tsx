@@ -6,8 +6,8 @@ import Error from '../../components/Error/Error'
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen'
 import InteractiveCanvas from '../../components/Canvas/Canvas'
 import { useParams } from 'react-router-dom'
-import { BuildingData } from '../../services/interface/map-object'
 import Header from '../../components/Header/Header'
+import { GetObjectsResponse } from '../../services/interfaces/object'
 
 const HomePage: React.FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>()
@@ -53,7 +53,8 @@ const HomePage: React.FC = () => {
     const initializeData = async () => {
       setIsLoading(true)
       try {
-        const locationsData = await api.getObjectsByBuilding(buildingId)
+        if (!buildingId) return
+        const locationsData = await api.getObjects(buildingId)
         const mappedLocations = transformLocationsData(locationsData)
         setLocations(mappedLocations)
         setError(null)
@@ -65,9 +66,9 @@ const HomePage: React.FC = () => {
     }
 
     initializeData()
-  }, [])
+  }, [buildingId])
 
-  const transformLocationsData = (data: BuildingData): Record<string, string> => {
+  const transformLocationsData = (data: GetObjectsResponse): Record<string, string> => {
     const result: Record<string, string> = {}
 
     data.objects.floors.forEach((floor) => {
@@ -121,11 +122,17 @@ const HomePage: React.FC = () => {
 
           <div className={styles.dropdownContainer}>
             <Dropdown
-              options={locationOptions}
               placeholder="Откуда?"
               onChange={(value) => handleLocationChange(value)}
+              buildingId={buildingId}
+              searchable={true}
             />
-            <Dropdown options={locationOptions} placeholder="Куда?" onChange={(value) => handleLocationChange(value)} />
+            <Dropdown 
+              placeholder="Куда?" 
+              onChange={(value) => handleLocationChange(value)}
+              buildingId={buildingId}
+              searchable={true}
+            />
           </div>
         </div>
 

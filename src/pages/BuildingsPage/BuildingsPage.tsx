@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../services/public.api'
-import { Building } from '../../services/interface/building'
+import { Building } from '../../services/interfaces/building'
 import './BuildingsPage.css'
 
 const BuildingsPage: React.FC = () => {
