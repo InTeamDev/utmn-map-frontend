@@ -59,6 +59,13 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       }
     | undefined
   >()
+  const [movingObject, setMovingObject] = useState<{
+    id: string
+    initialX: number
+    initialY: number
+    offsetX: number
+    offsetY: number
+  } | null>(null)
   const [scaleValue, setScaleValue] = useState(1)
   const [isInfoBoxVisible, setInfoBoxVisible] = useState(true)
   const [mode, setMode] = useState<Mode>('select')
@@ -133,6 +140,18 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         .filter(obj => !obj.name.includes('IDK'))
         .forEach((obj) => {
           const type = getObjectTypeById(obj.object_type_id)
+          // Проверяем, является ли объект выбранным
+          const isSelected = selectedObject && 
+            selectedObject.position.x === obj.x && 
+            selectedObject.position.y === obj.y
+          
+          // Если объект выбран, рисуем зеленую обводку
+          if (isSelected) {
+            ctx.strokeStyle = '#4CAF50'
+            ctx.lineWidth = 3
+            ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
+          }
+          
           ctx.fillStyle = OBJECT_COLORS[type] || DEFAULT_OBJECT_COLOR
           ctx.fillRect(obj.x, obj.y, obj.width, obj.height)
           ctx.strokeStyle = '#A0C4E0'
@@ -173,57 +192,108 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
 
       ctx.restore()
     },
-    [buildingData, currentFloor],
+    [buildingData, currentFloor, selectedObject],
   )
 
   // resize и обработчики
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+
+    // Get the container's dimensions
+    const container = canvas.parentElement
+    if (!container) return
+
+    const rect = container.getBoundingClientRect()
     const dpr = window.devicePixelRatio || 1
-    const cssWidth = window.innerWidth
-    const cssHeight = window.innerHeight
-    canvas.width = cssWidth * dpr
-    canvas.height = cssHeight * dpr
-    canvas.style.width = cssWidth + 'px'
-    canvas.style.height = cssHeight + 'px'
+
+    // Set the canvas size to match the container size
+    canvas.width = rect.width * dpr
+    canvas.height = rect.height * dpr
+    canvas.style.width = `${rect.width}px`
+    canvas.style.height = `${rect.height}px`
+
+    // Scale the context to account for the device pixel ratio
     const ctx = canvas.getContext('2d')
     if (ctx) {
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.scale(dpr, dpr)
     }
-    // Сброс трансформаций после resize
+
+    if (currentFloor) drawFloor(currentFloor)
+  }, [currentFloor, drawFloor])
+
+  // Сброс offset и scale только при первом монтировании
+  useEffect(() => {
     transformState.current.offset = { x: 0, y: 0 }
     transformState.current.scale = 1
     setScaleValue(1)
-    if (currentFloor) drawFloor(currentFloor)
-  }, [currentFloor, drawFloor])
+  }, [])
 
   const setupCanvasEvents = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
     const getMouseCoords = (e: MouseEvent) => {
+      const canvas = canvasRef.current
+      if (!canvas) return { x: 0, y: 0 }
       const rect = canvas.getBoundingClientRect()
-      const sx = canvas.width / rect.width
-      const sy = canvas.height / rect.height
-      const px = (e.clientX - rect.left) * sx
-      const py = (e.clientY - rect.top) * sy
-      const { offset, scale } = transformState.current
-      const mx = (px - offset.x) / scale
-      const my = (py - offset.y) / scale
-      return { mx, my }
+      // Координаты мыши в CSS-пикселях
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      return { x, y }
     }
 
     const mouseDown = (e: MouseEvent) => {
       if (mode === 'select') {
         transformState.current.isDragging = true
         transformState.current.lastPosition = { x: e.clientX, y: e.clientY }
+      } else if (mode === 'move') {
+        const { x, y } = getMouseCoords(e)
+        const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
+        const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
+        
+        const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
+        const found = objs.find((o) => {
+          return scaledX >= o.x && scaledX <= o.x + o.width && scaledY >= o.y && scaledY <= o.y + o.height
+        })
+        
+        if (found) {
+          setMovingObject({
+            id: found.id,
+            initialX: found.x,
+            initialY: found.y,
+            offsetX: scaledX - found.x,
+            offsetY: scaledY - found.y
+          })
+        }
       }
     }
 
-    const mouseUp = () => {
-      transformState.current.isDragging = false
+    const mouseUp = async () => {
+      if (mode === 'select') {
+        transformState.current.isDragging = false
+      } else if (mode === 'move' && movingObject) {
+        // Update object position in the backend
+        try {
+          if (!buildingId || !currentFloor) return
+          const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
+          const obj = objs.find(o => o.id === movingObject.id)
+          if (obj) {
+            await adminApi.updateObject(buildingId, currentFloor, obj.id, {
+              ...obj,
+              x: obj.x,
+              y: obj.y
+            })
+            // Refresh building data
+            const updatedData = await api.getObjects(buildingId)
+            setBuildingData(updatedData)
+          }
+        } catch (err) {
+          console.error('Failed to update object position:', err)
+        }
+        setMovingObject(null)
+      }
     }
 
     const mouseMove = (e: MouseEvent) => {
@@ -234,6 +304,22 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         transformState.current.offset.y += dy
         transformState.current.lastPosition = { x: e.clientX, y: e.clientY }
         if (currentFloor) drawFloor(currentFloor)
+      } else if (mode === 'move' && movingObject) {
+        const { x, y } = getMouseCoords(e)
+        const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
+        const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
+        
+        if (buildingData) {
+          const floor = buildingData.objects.floors.find((f) => f.floor.name === currentFloor)
+          if (floor) {
+            const obj = floor.objects.find(o => o.id === movingObject.id)
+            if (obj) {
+              obj.x = scaledX - movingObject.offsetX
+              obj.y = scaledY - movingObject.offsetY
+              if (currentFloor) drawFloor(currentFloor)
+            }
+          }
+        }
       }
     }
 
@@ -256,12 +342,16 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     }
 
     const click = (e: MouseEvent) => {
-      const { mx, my } = getMouseCoords(e)
+      const { x, y } = getMouseCoords(e)
 
       switch (mode) {
         case 'select': {
           const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
-          const found = objs.find((o) => mx >= o.x && mx <= o.x + o.width && my >= o.y && my <= o.y + o.height)
+          const found = objs.find((o) => {
+            const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
+            const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
+            return scaledX >= o.x && scaledX <= o.x + o.width && scaledY >= o.y && scaledY <= o.y + o.height
+          })
           if (found) {
             setSelectedObject({
               name: found.name || 'Unnamed',
@@ -277,8 +367,15 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         }
 
         case 'create': {
-          setNewObjectPosition({ x: mx, y: my })
+          const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
+          const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
+          setNewObjectPosition({ x: scaledX, y: scaledY })
           setCreationModalOpen(true)
+          break
+        }
+
+        case 'move': {
+          // TODO: переместить объект
           break
         }
 
@@ -310,7 +407,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       canvas.removeEventListener('wheel', wheel)
       canvas.removeEventListener('click', click)
     }
-  }, [mode, buildingData, currentFloor, drawFloor])
+  }, [mode, buildingData, currentFloor, drawFloor, movingObject])
 
   const handleCreateObject = async (data: NewObject) => {
     try {
@@ -330,6 +427,14 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     resizeCanvas()
     window.addEventListener('resize', resizeCanvas)
     const off = setupCanvasEvents()
+
+    // Add resize observer to handle page zoom changes
+    const resizeObserver = new ResizeObserver(() => {
+      resizeCanvas()
+    })
+    if (canvasRef.current) {
+      resizeObserver.observe(canvasRef.current)
+    }
 
     // === PINCH-TO-ZOOM ===
     const canvas = canvasRef.current
@@ -419,8 +524,9 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         canvas.removeEventListener('touchmove', handleTouchMove)
         canvas.removeEventListener('touchend', handleTouchEnd)
       }
+      resizeObserver.disconnect()
     }
-  }, [resizeCanvas, setupCanvasEvents, currentFloor, drawFloor])
+  }, [resizeCanvas, setupCanvasEvents, currentFloor, drawFloor, buildingData, mode, movingObject])
 
   const handleFloorChange = useCallback(
     (floor: string) => {

@@ -1,13 +1,18 @@
 import { useState } from 'react'
-import './CreateObjectModal.module.css'
-type ObjectType = 'cabinet' | 'wardrobe' | 'woman-toilet' | 'man-toilet' | 'gym'
+import { ObjectType } from '../../../services/interfaces/object'
+import styles from './CreateObjectModal.module.css' // ✅ Правильный импорт CSS-модуля
 
 const OBJECT_TYPES = [
-  { value: 'cabinet', label: 'Кабинет', color: 'rgba(0,128,255,1)' },
-  { value: 'wardrobe', label: 'Гардероб', color: 'rgba(255,165,0,0.5)' },
-  { value: 'woman-toilet', label: 'Женский туалет', color: 'rgba(255,192,203,0.5)' },
-  { value: 'man-toilet', label: 'Мужской туалет', color: 'rgba(144,238,144,0.5)' },
-  { value: 'gym', label: 'Спортзал', color: 'rgba(128,0,128,0.5)' },
+  { value: 'cabinet', label: 'Аудитория', color: '#4A90E2', icon: '🏫', description: 'Учебная аудитория' },
+  { value: 'department', label: 'Кафедра', color: '#F5A623', icon: '📚', description: 'Кафедра факультета' },
+  { value: 'man-toilet', label: 'Мужской туалет', color: '#7ED321', icon: '🚹', description: 'Мужской санузел' },
+  { value: 'woman-toilet', label: 'Женский туалет', color: '#FF69B4', icon: '🚺', description: 'Женский санузел' },
+  { value: 'stair', label: 'Лестница', color: '#9B9B9B', icon: '🪜', description: 'Межэтажная лестница' },
+  { value: 'wardrobe', label: 'Гардероб', color: '#A52A2A', icon: '🧥', description: 'Место для верхней одежды' },
+  { value: 'gym', label: 'Спортзал', color: '#9013FE', icon: '💪', description: 'Спортивный зал' },
+  { value: 'cafe', label: 'Кафетерий', color: '#FFD700', icon: '☕', description: 'Место для перекуса' },
+  { value: 'canteen', label: 'Столовая', color: '#FF4500', icon: '🍽️', description: 'Студенческая столовая' },
+  { value: 'chill-zone', label: 'Зона отдыха', color: '#00FF7F', icon: '🛋️', description: 'Место для отдыха' },
 ]
 
 export type NewObject = {
@@ -45,6 +50,7 @@ export const CreationModal = ({ isOpen, initialPosition, buildingId, currentFloo
     width: 2,
     height: 2,
   })
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -58,11 +64,7 @@ export const CreationModal = ({ isOpen, initialPosition, buildingId, currentFloo
 
     setIsSubmitting(true)
     try {
-      await onSubmit({
-        ...formData,
-        x: Number(formData.x),
-        y: Number(formData.y),
-      })
+      await onSubmit({ ...formData, x: Number(formData.x), y: Number(formData.y) })
       onClose()
     } catch (err) {
       setError('Ошибка при создании объекта')
@@ -72,78 +74,91 @@ export const CreationModal = ({ isOpen, initialPosition, buildingId, currentFloo
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h3 className="modal-title">Создать объект</h3>
-
-        {error && <div className="error-message">{error}</div>}
-
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Название"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
+    <div className={styles.modalOverlay}>
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>Создать объект</h3>
         </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Алиас"
-            value={formData.alias}
-            onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
-          />
-        </div>
+        {error && <div className={styles.errorMessage}>{error}</div>}
 
-        <div className="form-group">
-          <textarea
-            placeholder="Описание"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
-        </div>
+        <div className={styles.formSection}>
+          <div className={styles.formGroup}>
+            <input
+              type="text"
+              placeholder="Name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className={styles.inputField}
+            />
+          </div>
 
-        <div className="coord-group">
-          <div className="form-group">
+          <div className={styles.formGroup}>
+            <input
+              type="text"
+              placeholder="Alias"
+              value={formData.alias}
+              onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
+              className={styles.inputField}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className={styles.inputField}
+              rows={3}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <select
+              value={formData.type}
+              onChange={e => setFormData({ ...formData, type: e.target.value as ObjectType })}
+              className={styles.comboBox}
+            >
+              <option value="" disabled hidden>Type</option>
+              {OBJECT_TYPES.map(type => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.coordGroup}>
             <input
               type="number"
-              placeholder="Координата X"
+              placeholder="X"
               value={formData.x}
               onChange={(e) => setFormData({ ...formData, x: Number(e.target.value) })}
+              className={styles.inputField}
             />
-          </div>
-          <div className="form-group">
             <input
               type="number"
-              placeholder="Координата Y"
+              placeholder="Y"
               value={formData.y}
               onChange={(e) => setFormData({ ...formData, y: Number(e.target.value) })}
+              className={styles.inputField}
             />
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Тип объекта</label>
-          <select
-            value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value as ObjectType })}
-            className="combo-box"
+        <div className={styles.modalActions}>
+          <button 
+            className={styles.btnPrimary} 
+            onClick={handleSubmit}
+            disabled={isSubmitting}
           >
-            {OBJECT_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="modal-actions">
-          <button className="btn secondary" onClick={onClose}>
-            Отменить
+            Сохранить
           </button>
-          <button className="btn primary" onClick={handleSubmit}>
-            {isSubmitting ? 'Сохранение...' : 'Сохранить'}
+          <button 
+            className={styles.btnSecondary} 
+            onClick={onClose}
+          >
+            Отменить
           </button>
         </div>
       </div>

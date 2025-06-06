@@ -21,7 +21,7 @@ const App: React.FC = () => {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<BuildingsPage />} />
-            <Route path="/building/:buildingId" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/building/:buildingId" element={<HomePage />} />
             <Route
               path="/admin"
               element={
