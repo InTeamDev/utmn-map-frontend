@@ -71,6 +71,8 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
   const [mode, setMode] = useState<Mode>('select')
   const [creationModalOpen, setCreationModalOpen] = useState(false)
   const [newObjectPosition, setNewObjectPosition] = useState({ x: 0, y: 0 })
+  const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([])
+  const [isPolygonDrawing, setIsPolygonDrawing] = useState(false)
 
   const transformState = useRef({
     offset: { x: 0, y: 0 },
@@ -191,8 +193,32 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         })
 
       ctx.restore()
+      // Рисуем временный полигон, если рисуем
+      if (mode === 'polygon' && polygonPoints.length > 0) {
+        ctx.save()
+        ctx.translate(transformState.current.offset.x, transformState.current.offset.y)
+        ctx.scale(transformState.current.scale, transformState.current.scale)
+        ctx.beginPath()
+        ctx.moveTo(polygonPoints[0].x, polygonPoints[0].y)
+        for (let i = 1; i < polygonPoints.length; i++) {
+          ctx.lineTo(polygonPoints[i].x, polygonPoints[i].y)
+        }
+        ctx.strokeStyle = '#1976d2'
+        ctx.lineWidth = 2
+        ctx.setLineDash([6, 4])
+        ctx.stroke()
+        ctx.setLineDash([])
+        // Рисуем точки
+        for (const pt of polygonPoints) {
+          ctx.beginPath()
+          ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI)
+          ctx.fillStyle = '#1976d2'
+          ctx.fill()
+        }
+        ctx.restore()
+      }
     },
-    [buildingData, currentFloor, selectedObject],
+    [buildingData, currentFloor, selectedObject, mode, polygonPoints],
   )
 
   // resize и обработчики
@@ -385,7 +411,10 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         }
 
         case 'polygon': {
-          // TODO: добавить точку полигона
+          const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
+          const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
+          setPolygonPoints(prev => [...prev, { x: scaledX, y: scaledY }])
+          setIsPolygonDrawing(true)
           break
         }
 
@@ -420,6 +449,27 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       setBuildingData(updatedData)
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  const finishPolygon = async () => {
+    if (!buildingId || !currentFloor || polygonPoints.length < 3) return
+    try {
+      // Автогенерируем label
+      const label = `Фон этажа ${currentFloor}`
+      const zIndex = 0
+      const polygon = await adminApi.createPolygon(buildingId, currentFloor, label, zIndex)
+      // Формируем точки для API
+      const points = polygonPoints.map((p, idx) => ({ point_order: idx, x: p.x, y: p.y }))
+      await adminApi.addPolygonPoints(buildingId, currentFloor, polygon.id, points)
+      // Обновляем данные здания
+      const updatedData = await api.getObjects(buildingId)
+      setBuildingData(updatedData)
+      setPolygonPoints([])
+      setIsPolygonDrawing(false)
+      setMode('select')
+    } catch (err) {
+      console.error('Ошибка создания полигона:', err)
     }
   }
 
@@ -671,6 +721,16 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         onZoomOut={handleZoomOut}
         onResetScale={handleResetScale}
       />
+
+      {/* Кнопка завершения полигона */}
+      {mode === 'polygon' && isPolygonDrawing && polygonPoints.length >= 3 && (
+        <button
+          style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}
+          onClick={finishPolygon}
+        >
+          Завершить полигон
+        </button>
+      )}
     </div>
   )
 }
