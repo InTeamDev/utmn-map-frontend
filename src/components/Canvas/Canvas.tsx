@@ -42,9 +42,10 @@ const iconCache: Record<string, HTMLImageElement> = {}
 interface InteractiveCanvasProps {
   showPanel?: boolean
   showEditBtns?: boolean
+  route?: any[] | null
 }
 
-const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false, showEditBtns = false }) => {
+const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false, showEditBtns = false, route }) => {
   const { buildingId } = useParams<{ buildingId: string }>()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [buildingData, setBuildingData] = useState<GetObjectsResponse | null>(null)
@@ -73,6 +74,11 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
   const [newObjectPosition, setNewObjectPosition] = useState({ x: 0, y: 0 })
   const [polygonPoints, setPolygonPoints] = useState<{ x: number; y: number }[]>([])
   const [isPolygonDrawing, setIsPolygonDrawing] = useState(false)
+  const [nodes, setNodes] = useState<any[]>([])
+  const [intersections, setIntersections] = useState<any[]>([])
+  const [animationProgress, setAnimationProgress] = useState(1)
+  const animationRef = useRef<number | null>(null)
+  const prevRouteRef = useRef<any[] | null>(null)
 
   const transformState = useRef({
     offset: { x: 0, y: 0 },
@@ -81,6 +87,36 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
     lastPosition: { x: 0, y: 0 },
   })
 
+  // Анимация маршрута
+  const animateRoute = useRef<((ts: number) => void) | null>(null)
+  useEffect(() => {
+    if (!route || !Array.isArray(route) || route.length === 0) {
+      setAnimationProgress(1)
+      prevRouteRef.current = null
+      return
+    }
+    if (prevRouteRef.current !== route) {
+      setAnimationProgress(0)
+      prevRouteRef.current = route
+      let start: number | null = null
+      const duration = 1200 + route.length * 80
+      animateRoute.current = function animate(ts: number) {
+        if (start === null) start = ts
+        const elapsed = ts - start
+        const progress = Math.min(1, elapsed / duration)
+        setAnimationProgress(progress)
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animateRoute.current!)
+        }
+      }
+      animationRef.current && cancelAnimationFrame(animationRef.current)
+      animationRef.current = requestAnimationFrame(animateRoute.current)
+    }
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
+    }
+  }, [route])
+
   // Загрузка данных здания
   useEffect(() => {
     if (!buildingId) return
@@ -88,13 +124,49 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       try {
         const data = await api.getObjects(buildingId)
         setBuildingData(data)
-        console.log(data)
         if (data.objects.floors.length > 0) setCurrentFloor(data.objects.floors[0].floor.name)
+        // Загружаем nodes и intersections
+        const nodesRes = await api.getGraphNodes(buildingId)
+        setNodes(nodesRes.nodes)
+        const intersectionsRes = await api.getIntersections(buildingId)
+        setIntersections(intersectionsRes.intersections)
       } catch (err) {
         console.error(err)
       }
     })()
   }, [buildingId])
+
+  // Вспомогательная функция для поиска этажа по id узла
+  const findFloorIdByNodeId = useCallback((nodeId: string): string | null => {
+    if (!buildingData) return null;
+    // Среди doors
+    for (const fl of buildingData.objects.floors) {
+      for (const obj of fl.objects) {
+        if (obj.doors && obj.doors.find(d => d.id === nodeId)) return fl.floor.name
+      }
+    }
+    // Среди intersections
+    if (intersections) {
+      const i = intersections.find(i => i.id === nodeId)
+      if (i) {
+        const fl = buildingData.objects.floors.find(f => f.floor.id === i.floor_id)
+        if (fl) return fl.floor.name
+      }
+    }
+    // Среди nodes
+    if (nodes) {
+      const n = nodes.find(n => n.id === nodeId)
+      if (n) {
+        const fl = buildingData.objects.floors.find(f => f.floor.id === n.floor_id)
+        if (fl) return fl.floor.name
+      }
+    }
+    // Среди объектов
+    for (const fl of buildingData.objects.floors) {
+      if (fl.objects.find(o => o.id === nodeId)) return fl.floor.name
+    }
+    return null
+  }, [buildingData, intersections, nodes]);
 
   // Отрисовка этажа с улучшенным стилем
   const drawFloor = useCallback(
@@ -137,7 +209,6 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         })
       }
 
-      // Отрисовка объектов
       floor.objects
         .filter(obj => !obj.name.includes('IDK'))
         .forEach((obj) => {
@@ -192,6 +263,97 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
           })
         })
 
+      // Отрисовка маршрута
+      if (route && Array.isArray(route) && buildingData) {
+        const first = route[0]
+        const last = route[route.length - 1]
+        const fromFloor = findFloorIdByNodeId(first.from_id)
+        const toFloor = findFloorIdByNodeId(last.to_id)
+        if (fromFloor && toFloor && fromFloor === toFloor && fromFloor === currentFloor) {
+          ctx.save()
+          ctx.strokeStyle = '#4CAF50'
+          ctx.lineWidth = 4
+          ctx.setLineDash([10, 8])
+          let totalLength = 0
+          const segments: { from: {x:number, y:number}, to: {x:number, y:number}, length: number }[] = []
+          for (const conn of route) {
+            let fromCoord = null
+            let toCoord = null
+            for (const fl of buildingData.objects.floors) {
+              for (const obj of fl.objects) {
+                if (!fromCoord && obj.doors) {
+                  const d = obj.doors.find(d => d.id === conn.from_id)
+                  if (d) fromCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 }
+                }
+                if (!toCoord && obj.doors) {
+                  const d = obj.doors.find(d => d.id === conn.to_id)
+                  if (d) toCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 }
+                }
+              }
+            }
+            if (!fromCoord && intersections) {
+              const i = intersections.find(i => i.id === conn.from_id)
+              if (i) fromCoord = { x: i.x, y: i.y }
+            }
+            if (!toCoord && intersections) {
+              const i = intersections.find(i => i.id === conn.to_id)
+              if (i) toCoord = { x: i.x, y: i.y }
+            }
+            if (!fromCoord && nodes) {
+              const n = nodes.find(n => n.id === conn.from_id)
+              if (n) fromCoord = { x: n.x, y: n.y }
+            }
+            if (!toCoord && nodes) {
+              const n = nodes.find(n => n.id === conn.to_id)
+              if (n) toCoord = { x: n.x, y: n.y }
+            }
+            if (!fromCoord) {
+              for (const fl of buildingData.objects.floors) {
+                const o = fl.objects.find(o => o.id === conn.from_id)
+                if (o) fromCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 }
+              }
+            }
+            if (!toCoord) {
+              for (const fl of buildingData.objects.floors) {
+                const o = fl.objects.find(o => o.id === conn.to_id)
+                if (o) toCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 }
+              }
+            }
+            if (fromCoord && toCoord) {
+              const dx = toCoord.x - fromCoord.x
+              const dy = toCoord.y - fromCoord.y
+              const len = Math.sqrt(dx*dx + dy*dy)
+              segments.push({ from: fromCoord, to: toCoord, length: len })
+              totalLength += len
+            }
+          }
+          let drawn = 0
+          let remain = totalLength * animationProgress
+          for (const seg of segments) {
+            if (remain <= 0) break
+            const segLen = seg.length
+            if (remain >= segLen) {
+              ctx.beginPath()
+              ctx.moveTo(seg.from.x, seg.from.y)
+              ctx.lineTo(seg.to.x, seg.to.y)
+              ctx.stroke()
+              remain -= segLen
+            } else {
+              const t = remain / segLen
+              const x = seg.from.x + (seg.to.x - seg.from.x) * t
+              const y = seg.from.y + (seg.to.y - seg.from.y) * t
+              ctx.beginPath()
+              ctx.moveTo(seg.from.x, seg.from.y)
+              ctx.lineTo(x, y)
+              ctx.stroke()
+              remain = 0
+            }
+          }
+          ctx.setLineDash([])
+          ctx.restore()
+        }
+      }
+
       ctx.restore()
       // Рисуем временный полигон, если рисуем
       if (mode === 'polygon' && polygonPoints.length > 0) {
@@ -218,7 +380,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         ctx.restore()
       }
     },
-    [buildingData, currentFloor, selectedObject, mode, polygonPoints],
+    [buildingData, currentFloor, selectedObject, mode, polygonPoints, route, nodes, intersections, animationProgress],
   )
 
   // resize и обработчики

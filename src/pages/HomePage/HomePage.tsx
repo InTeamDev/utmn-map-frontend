@@ -13,9 +13,13 @@ const HomePage: React.FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>()
   const [currentFloor, setCurrentFloor] = useState('Floor_First')
   const [locations, setLocations] = useState<Record<string, string>>({})
+  const [buildingData, setBuildingData] = useState<GetObjectsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showHeader, setShowHeader] = useState(true)
+  const [from, setFrom] = useState<string | null>(null)
+  const [to, setTo] = useState<string | null>(null)
+  const [route, setRoute] = useState<any[] | null>(null)
 
   const locationOptions = useMemo(() => {
     if (!Object.keys(locations).length) return []
@@ -55,6 +59,7 @@ const HomePage: React.FC = () => {
       try {
         if (!buildingId) return
         const locationsData = await api.getObjects(buildingId)
+        setBuildingData(locationsData)
         const mappedLocations = transformLocationsData(locationsData)
         setLocations(mappedLocations)
         setError(null)
@@ -89,8 +94,10 @@ const HomePage: React.FC = () => {
   )
 
   const handleLocationChange = useCallback(
-    (value: string | null) => {
+    (value: string | null, type: 'from' | 'to') => {
       if (!value) return
+      if (type === 'from') setFrom(value)
+      if (type === 'to') setTo(value)
 
       const floor = `Floor_${value.split('_')[1]}`
       if (floor !== currentFloor) {
@@ -99,6 +106,51 @@ const HomePage: React.FC = () => {
     },
     [currentFloor, handleFloorChange],
   )
+
+  // Запрос маршрута, когда выбраны обе точки
+  useEffect(() => {
+    const fetchRoute = async () => {
+      if (!buildingId || !from || !to || from === to) {
+        setRoute(null)
+        return
+      }
+      if (!buildingData) return
+      // Найти объекты по id
+      let fromObj = null
+      let toObj = null
+      for (const floor of buildingData.objects.floors) {
+        if (!fromObj) fromObj = floor.objects.find(o => o.id === from)
+        if (!toObj) toObj = floor.objects.find(o => o.id === to)
+      }
+      if (!fromObj || !toObj) {
+        setError('Не удалось найти выбранные объекты.')
+        setRoute(null)
+        return
+      }
+      // Найти первую дверь у каждого объекта
+      const fromDoor = fromObj.doors && fromObj.doors.length > 0 ? fromObj.doors[0] : null
+      const toDoor = toObj.doors && toObj.doors.length > 0 ? toObj.doors[0] : null
+      if (!fromDoor || !toDoor) {
+        setError('У выбранного объекта нет двери для построения маршрута.')
+        setRoute(null)
+        return
+      }
+      try {
+        const res: any = await api.buildRoute(buildingId, {
+          start_node_id: fromDoor.id,
+          end_node_id: toDoor.id,
+        })
+        setRoute(res.edges ? res.edges : res.route)
+        setError(null)
+      } catch (err) {
+        setError('Не удалось построить маршрут. Попробуйте еще раз.')
+        setRoute(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchRoute()
+  }, [buildingId, from, to, buildingData])
 
   useEffect(() => {
     function handleResize() {
@@ -123,20 +175,20 @@ const HomePage: React.FC = () => {
           <div className={styles.dropdownContainer}>
             <Dropdown
               placeholder="Откуда?"
-              onChange={(value) => handleLocationChange(value)}
+              onChange={(value) => handleLocationChange(value, 'from')}
               buildingId={buildingId}
               searchable={true}
             />
             <Dropdown 
               placeholder="Куда?" 
-              onChange={(value) => handleLocationChange(value)}
+              onChange={(value) => handleLocationChange(value, 'to')}
               buildingId={buildingId}
               searchable={true}
             />
           </div>
         </div>
 
-        <InteractiveCanvas showPanel={false} showEditBtns={false} />
+        <InteractiveCanvas showPanel={false} showEditBtns={false} route={route} />
       </div>
     </>
   )
