@@ -265,92 +265,97 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
 
       // Отрисовка маршрута
       if (route && Array.isArray(route) && buildingData) {
-        const first = route[0]
-        const last = route[route.length - 1]
-        const fromFloor = findFloorIdByNodeId(first.from_id)
-        const toFloor = findFloorIdByNodeId(last.to_id)
-        if (fromFloor && toFloor && fromFloor === toFloor && fromFloor === currentFloor) {
-          ctx.save()
-          ctx.strokeStyle = '#4CAF50'
-          ctx.lineWidth = 4
-          ctx.setLineDash([10, 8])
-          let totalLength = 0
-          const segments: { from: {x:number, y:number}, to: {x:number, y:number}, length: number }[] = []
-          for (const conn of route) {
-            let fromCoord = null
-            let toCoord = null
+        // Новый блок: фильтруем сегменты маршрута, относящиеся к текущему этажу
+        const floorSegments = [];
+        for (const conn of route) {
+          const fromFloor = findFloorIdByNodeId(conn.from_id);
+          const toFloor = findFloorIdByNodeId(conn.to_id);
+          if (fromFloor === currentFloor && toFloor === currentFloor) {
+            floorSegments.push(conn);
+          }
+        }
+        if (floorSegments.length > 0) {
+          ctx.save();
+          ctx.strokeStyle = '#4CAF50';
+          ctx.lineWidth = 4;
+          ctx.setLineDash([10, 8]);
+          let totalLength = 0;
+          const segments = [];
+          for (const conn of floorSegments) {
+            let fromCoord = null;
+            let toCoord = null;
             for (const fl of buildingData.objects.floors) {
               for (const obj of fl.objects) {
                 if (!fromCoord && obj.doors) {
-                  const d = obj.doors.find(d => d.id === conn.from_id)
-                  if (d) fromCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 }
+                  const d = obj.doors.find(d => d.id === conn.from_id);
+                  if (d) fromCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 };
                 }
                 if (!toCoord && obj.doors) {
-                  const d = obj.doors.find(d => d.id === conn.to_id)
-                  if (d) toCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 }
+                  const d = obj.doors.find(d => d.id === conn.to_id);
+                  if (d) toCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 };
                 }
               }
             }
             if (!fromCoord && intersections) {
-              const i = intersections.find(i => i.id === conn.from_id)
-              if (i) fromCoord = { x: i.x, y: i.y }
+              const i = intersections.find(i => i.id === conn.from_id);
+              if (i) fromCoord = { x: i.x, y: i.y };
             }
             if (!toCoord && intersections) {
-              const i = intersections.find(i => i.id === conn.to_id)
-              if (i) toCoord = { x: i.x, y: i.y }
+              const i = intersections.find(i => i.id === conn.to_id);
+              if (i) toCoord = { x: i.x, y: i.y };
             }
             if (!fromCoord && nodes) {
-              const n = nodes.find(n => n.id === conn.from_id)
-              if (n) fromCoord = { x: n.x, y: n.y }
+              const n = nodes.find(n => n.id === conn.from_id);
+              if (n) fromCoord = { x: n.x, y: n.y };
             }
             if (!toCoord && nodes) {
-              const n = nodes.find(n => n.id === conn.to_id)
-              if (n) toCoord = { x: n.x, y: n.y }
+              const n = nodes.find(n => n.id === conn.to_id);
+              if (n) toCoord = { x: n.x, y: n.y };
             }
             if (!fromCoord) {
               for (const fl of buildingData.objects.floors) {
-                const o = fl.objects.find(o => o.id === conn.from_id)
-                if (o) fromCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 }
+                const o = fl.objects.find(o => o.id === conn.from_id);
+                if (o) fromCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 };
               }
             }
             if (!toCoord) {
               for (const fl of buildingData.objects.floors) {
-                const o = fl.objects.find(o => o.id === conn.to_id)
-                if (o) toCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 }
+                const o = fl.objects.find(o => o.id === conn.to_id);
+                if (o) toCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 };
               }
             }
             if (fromCoord && toCoord) {
-              const dx = toCoord.x - fromCoord.x
-              const dy = toCoord.y - fromCoord.y
-              const len = Math.sqrt(dx*dx + dy*dy)
-              segments.push({ from: fromCoord, to: toCoord, length: len })
-              totalLength += len
+              const dx = toCoord.x - fromCoord.x;
+              const dy = toCoord.y - fromCoord.y;
+              const len = Math.sqrt(dx*dx + dy*dy);
+              segments.push({ from: fromCoord, to: toCoord, length: len });
+              totalLength += len;
             }
           }
-          let drawn = 0
-          let remain = totalLength * animationProgress
+          let drawn = 0;
+          let remain = totalLength * animationProgress;
           for (const seg of segments) {
-            if (remain <= 0) break
-            const segLen = seg.length
+            if (remain <= 0) break;
+            const segLen = seg.length;
             if (remain >= segLen) {
-              ctx.beginPath()
-              ctx.moveTo(seg.from.x, seg.from.y)
-              ctx.lineTo(seg.to.x, seg.to.y)
-              ctx.stroke()
-              remain -= segLen
+              ctx.beginPath();
+              ctx.moveTo(seg.from.x, seg.from.y);
+              ctx.lineTo(seg.to.x, seg.to.y);
+              ctx.stroke();
+              remain -= segLen;
             } else {
-              const t = remain / segLen
-              const x = seg.from.x + (seg.to.x - seg.from.x) * t
-              const y = seg.from.y + (seg.to.y - seg.from.y) * t
-              ctx.beginPath()
-              ctx.moveTo(seg.from.x, seg.from.y)
-              ctx.lineTo(x, y)
-              ctx.stroke()
-              remain = 0
+              const t = remain / segLen;
+              const x = seg.from.x + (seg.to.x - seg.from.x) * t;
+              const y = seg.from.y + (seg.to.y - seg.from.y) * t;
+              ctx.beginPath();
+              ctx.moveTo(seg.from.x, seg.from.y);
+              ctx.lineTo(x, y);
+              ctx.stroke();
+              remain = 0;
             }
           }
-          ctx.setLineDash([])
-          ctx.restore()
+          ctx.setLineDash([]);
+          ctx.restore();
         }
       }
 
