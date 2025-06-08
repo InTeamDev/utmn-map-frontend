@@ -25,6 +25,21 @@
   overflow-y: auto;
 }
 
+.routePanelDesktop {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-start;
+  pointer-events: none;
+}
+
+.routePanelDesktop > * {
+  pointer-events: auto;
+}
+
 .dropdownContainer {
   display: flex;
   margin-top: 48px;
@@ -48,7 +63,10 @@
   align-items: center;
 }
 
-/* Адаптация для мобильных устройств */
+.routePanelMobile {
+  display: none;
+}
+
 @media (max-width: 668px) {
   .container {
     padding: 0;
@@ -103,4 +121,32 @@
   .buttonContainer {
     padding: 4px;
   }
+
+  .routePanelMobile {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    width: 100vw;
+    pointer-events: none;
+  }
+  .routePanelMobile > * {
+    pointer-events: auto;
+  }
+  .routePanelDesktop {
+    display: none;
+  }
+}
+
+/* Поправка для RoutePanel, чтобы не обрезались шаги и время */
+.routePanelDesktop .panel,
+.routePanelMobile .panel {
+  min-width: 220px;
+  max-width: 100vw;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 18px;
+  z-index: 200;
 }

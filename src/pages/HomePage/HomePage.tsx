@@ -8,6 +8,7 @@ import InteractiveCanvas from '../../components/Canvas/Canvas'
 import { useParams } from 'react-router-dom'
 import Header from '../../components/Header/Header'
 import { GetObjectsResponse } from '../../services/interfaces/object'
+import RoutePanel from '../../components/RoutePanel/RoutePanel'
 
 const HomePage: React.FC = () => {
   const { buildingId } = useParams<{ buildingId: string }>()
@@ -161,6 +162,72 @@ const HomePage: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Вспомогательная функция для поиска объекта по id или по id двери
+  const findObjectById = (id: string) => {
+    if (!buildingData) return null
+    // Сначала ищем объект по id
+    for (const floor of buildingData.objects.floors) {
+      const obj = floor.objects.find((o) => o.id === id)
+      if (obj) return obj
+    }
+    // Если не найден, ищем объект по id двери
+    for (const floor of buildingData.objects.floors) {
+      for (const obj of floor.objects) {
+        if (obj.doors && obj.doors.some((door) => door.id === id)) {
+          return obj
+        }
+      }
+    }
+    return null
+  }
+
+  // Формируем точки маршрута для RoutePanel
+  const routePoints = useMemo(() => {
+    if (!route || !route.length) return []
+    const points: { label: string; type: 'start' | 'intermediate' | 'end'; description?: string }[] = []
+    // Собираем уникальные id точек маршрута (from_id первой, to_id последней, промежуточные)
+    const ids: string[] = [route[0]?.from_id]
+    for (const edge of route) {
+      ids.push(edge.to_id)
+    }
+    ids.forEach((id, idx) => {
+      const obj = findObjectById(id)
+      if (!obj) return // Неизвестные точки не отображаем
+      let type: 'start' | 'intermediate' | 'end' = 'intermediate'
+      if (idx === 0) type = 'start'
+      else if (idx === ids.length - 1) type = 'end'
+      let label = obj.name
+      // Для лестницы и гардероба можно явно подписывать
+      if (obj.object_type_id === 5) label = 'Лестница'
+      if (obj.object_type_id === 6) label = 'Гардероб'
+      points.push({ label, type })
+    })
+    // Удаляем дубликаты лестниц среди промежуточных точек (оставляем только первую)
+    const seenStairs = new Set()
+    return points.filter((p, idx) => {
+      if (p.type !== 'intermediate' || p.label !== 'Лестница') return true
+      if (seenStairs.has(p.label)) return false
+      seenStairs.add(p.label)
+      return true
+    })
+  }, [route, buildingData])
+
+  // Функция для смены направления маршрута
+  const handleReverseRoute = useCallback(() => {
+    setFrom((prevFrom) => {
+      setTo(prevFrom)
+      return to
+    })
+  }, [to])
+
+  // Подсчет шагов и времени (примерно)
+  const totalDistance = useMemo(() => route?.reduce((sum, e) => sum + (e.weight || 0), 0) || 0, [route])
+  // 1 шаг = 10px
+  const steps = Math.round(totalDistance / 10)
+  // 1 шаг = 0.6 сек
+  const seconds = Math.round(steps * 0.6)
+  const timeString = `${seconds} сек`
+
   if (isLoading) {
     return <LoadingScreen />
   }
@@ -172,23 +239,51 @@ const HomePage: React.FC = () => {
         <div className={styles.navigationPanel}>
           {error && <Error message={error} />}
 
+          <div className={styles.routePanelDesktop}>
+            {route && (
+              <RoutePanel
+                points={routePoints}
+                time={timeString}
+                steps={steps}
+                onReverse={handleReverseRoute}
+                onClose={() => setRoute(null)}
+              />
+            )}
+          </div>
+
           <div className={styles.dropdownContainer}>
             <Dropdown
               placeholder="Откуда?"
               onChange={(value) => handleLocationChange(value, 'from')}
               buildingId={buildingId}
               searchable={true}
+              value={from}
+              options={locationOptions}
             />
             <Dropdown 
               placeholder="Куда?" 
               onChange={(value) => handleLocationChange(value, 'to')}
               buildingId={buildingId}
               searchable={true}
+              value={to}
+              options={locationOptions}
             />
           </div>
         </div>
 
         <InteractiveCanvas showPanel={false} showEditBtns={false} route={route} />
+      </div>
+      {/* RoutePanel для мобильной версии */}
+      <div className={styles.routePanelMobile}>
+        {route && (
+          <RoutePanel
+            points={routePoints}
+            time={timeString}
+            steps={steps}
+            onReverse={handleReverseRoute}
+            onClose={() => setRoute(null)}
+          />
+        )}
       </div>
     </>
   )
