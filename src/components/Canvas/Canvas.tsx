@@ -11,12 +11,15 @@ import { ScaleControls } from './Scale/ScaleControl'
 
 // Иконки для объектов
 import WardrobeIcon from '../../assets/wardrobe.svg'
-import KitchenIcon from '../../assets/kitchen.svg'
-import CafeteriaIcon from '../../assets/cafeteria.svg'
+import CafeIcon from '../../assets/cafe.svg'
+import CafeteriaIcon from '../../assets/canteen.svg'
 import GymIcon from '../../assets/gym.svg'
 import ManToiletIcon from '../../assets/man-toilet.svg'
-import WomanToiletIcon from '../../assets/woman-toilet.svg'
+import WomanToiletIcon from '../../assets/women-toilet.svg'
 import StairIcon from '../../assets/stair.svg'
+import DepartmentIcon from '../../assets/department.svg'
+import ChillZoneIcon from '../../assets/chill-zone.svg'
+import CabinetIcon from '../../assets/Point Icon.svg'
 
 // Типы для режимов работы
 export type Mode = 'select' | 'create' | 'move' | 'route' | 'polygon'
@@ -777,7 +780,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       case 'wardrobe':
         return WardrobeIcon
       case 'cafe':
-        return KitchenIcon
+        return CafeIcon
       case 'canteen':
         return CafeteriaIcon
       case 'gym':
@@ -788,6 +791,12 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         return WomanToiletIcon
       case 'stair':
         return StairIcon
+      case 'cabinet':
+        return CabinetIcon
+      case 'department':
+        return DepartmentIcon
+      case 'chill-zone':
+        return ChillZoneIcon
       default:
         return ''
     }

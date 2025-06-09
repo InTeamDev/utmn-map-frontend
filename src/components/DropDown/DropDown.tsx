@@ -8,11 +8,16 @@ import { SearchResult, ObjectType, getObjectTypeById } from '../../services/inte
 // Иконки для объектов
 import WardrobeIcon from '../../assets/wardrobe.svg'
 import KitchenIcon from '../../assets/kitchen.svg'
-import CafeteriaIcon from '../../assets/cafeteria.svg'
+import CafeteriaIcon from '../../assets/canteen.svg'
 import GymIcon from '../../assets/gym.svg'
 import ManToiletIcon from '../../assets/man-toilet.svg'
-import WomanToiletIcon from '../../assets/woman-toilet.svg'
+import WomanToiletIcon from '../../assets/women-toilet.svg'
 import StairIcon from '../../assets/stair.svg'
+import DepartmentIcon from '../../assets/department.svg'
+import ChillZoneIcon from '../../assets/chill-zone.svg'
+import CabinetIcon from '../../assets/Point Icon.svg'
+import CafeIcon from '../../assets/cafe.svg'
+
 
 interface DropdownOption {
   value: string
@@ -51,7 +56,7 @@ const DropdownOption = memo(
         case 'wardrobe':
           return WardrobeIcon
         case 'cafe':
-          return KitchenIcon
+          return CafeIcon
         case 'canteen':
           return CafeteriaIcon
         case 'gym':
@@ -62,6 +67,12 @@ const DropdownOption = memo(
           return WomanToiletIcon
         case 'stair':
           return StairIcon
+        case 'cabinet':
+          return CabinetIcon
+        case 'department':
+          return DepartmentIcon
+        case 'chill-zone':
+          return ChillZoneIcon
         default:
           return null
       }
@@ -211,7 +222,7 @@ const Dropdown: React.FC<DropdownProps> = ({
       <div className={classNames(styles.dropdownContainer, { [styles.small]: small })} ref={dropdownRef}>
         <div className={styles.innerBox}>
           <span className={styles.iconLeft}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#656565" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C8 2 4 6 4 10c0 5.25 7 12 8 12s8-6.75 8-12c0-4-4-8-8-8z"/></svg>
+            <img src={CabinetIcon} alt="" width={28} height={28} />
           </span>
           <input
             type="text"
