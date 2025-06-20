@@ -1,4 +1,3 @@
-/* Header как на скрине */
 .header {
   width: 100%;
   height: 48px;
@@ -17,7 +16,18 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Распределяет пространство между left и кнопкой */
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Отступ между логотипом и заголовком */
+}
+
+.logo {
+  height: 44px;
+  width: auto;
 }
 
 .headerTitle {
@@ -25,8 +35,15 @@
   font-size: 20px;
   font-weight: 600;
   margin: 0;
+  white-space: nowrap; /* Запрет переноса текста */
 }
 
+/* Если кнопки нет, left займёт всё пространство */
+.headerContent:not(:has(.logoutButton)) .left {
+  flex-grow: 1;
+}
+
+/* Стили кнопки (оставляем ваши текущие) */
 .logoutButton {
   background: #fff;
   color: #0f3f60;
@@ -47,44 +64,4 @@
   color: #fff;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(15, 63, 96, 0.2);
-}
-
-.logoutButton:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo {
-  height: 44px;
-  width: auto;
-  margin-right: 0;
-}
-.title {
-  color: #0f3f60;
-}
-.logout-button {
-  margin-left: auto;
-  background: #fff;
-  color: #222;
-  border: 1px solid #b3e6ff;
-  border-radius: 8px;
-  padding: 8px 18px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border 0.2s;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-.logout-button:hover {
-  background: #b3e6ff;
-  color: #0077b6;
-  border-color: #0077b6;
 }
