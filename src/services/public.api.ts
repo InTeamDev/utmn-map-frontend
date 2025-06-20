@@ -81,7 +81,7 @@ export const api = {
   async search(buildingId: string, query?: string, categories?: string[]): Promise<{ results: SearchResult[] }> {
     const params = new URLSearchParams()
     if (query) params.append('query', query)
-    if (categories) categories.forEach(cat => params.append('category', cat))
+    if (categories) categories.forEach((cat) => params.append('category', cat))
 
     const response = await fetch(`${API_BASE_URL}/api/buildings/${buildingId}/search?${params.toString()}`)
     return handleResponse<{ results: SearchResult[] }>(response)
