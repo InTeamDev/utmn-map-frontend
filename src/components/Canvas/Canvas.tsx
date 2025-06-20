@@ -61,6 +61,12 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         type: string
         position: { x: number; y: number }
       }
+    | {
+        id: string
+        object_id: string
+        type: 'door'
+        position: { x: number; y: number; width: number; height: number }
+      }
     | undefined
   >()
   const [movingObject, setMovingObject] = useState<{
@@ -140,36 +146,39 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
   }, [buildingId])
 
   // Вспомогательная функция для поиска этажа по id узла
-  const findFloorIdByNodeId = useCallback((nodeId: string): string | null => {
-    if (!buildingData) return null;
-    // Среди doors
-    for (const fl of buildingData.objects.floors) {
-      for (const obj of fl.objects) {
-        if (obj.doors && obj.doors.find(d => d.id === nodeId)) return fl.floor.name
+  const findFloorIdByNodeId = useCallback(
+    (nodeId: string): string | null => {
+      if (!buildingData) return null
+      // Среди doors
+      for (const fl of buildingData.objects.floors) {
+        for (const obj of fl.objects) {
+          if (obj.doors && obj.doors.find((d) => d.id === nodeId)) return fl.floor.name
+        }
       }
-    }
-    // Среди intersections
-    if (intersections) {
-      const i = intersections.find(i => i.id === nodeId)
-      if (i) {
-        const fl = buildingData.objects.floors.find(f => f.floor.id === i.floor_id)
-        if (fl) return fl.floor.name
+      // Среди intersections
+      if (intersections) {
+        const i = intersections.find((i) => i.id === nodeId)
+        if (i) {
+          const fl = buildingData.objects.floors.find((f) => f.floor.id === i.floor_id)
+          if (fl) return fl.floor.name
+        }
       }
-    }
-    // Среди nodes
-    if (nodes) {
-      const n = nodes.find(n => n.id === nodeId)
-      if (n) {
-        const fl = buildingData.objects.floors.find(f => f.floor.id === n.floor_id)
-        if (fl) return fl.floor.name
+      // Среди nodes
+      if (nodes) {
+        const n = nodes.find((n) => n.id === nodeId)
+        if (n) {
+          const fl = buildingData.objects.floors.find((f) => f.floor.id === n.floor_id)
+          if (fl) return fl.floor.name
+        }
       }
-    }
-    // Среди объектов
-    for (const fl of buildingData.objects.floors) {
-      if (fl.objects.find(o => o.id === nodeId)) return fl.floor.name
-    }
-    return null
-  }, [buildingData, intersections, nodes]);
+      // Среди объектов
+      for (const fl of buildingData.objects.floors) {
+        if (fl.objects.find((o) => o.id === nodeId)) return fl.floor.name
+      }
+      return null
+    },
+    [buildingData, intersections, nodes],
+  )
 
   // Отрисовка этажа с улучшенным стилем
   const drawFloor = useCallback(
@@ -213,21 +222,20 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       }
 
       floor.objects
-        .filter(obj => !obj.name.includes('IDK'))
+        .filter((obj) => !obj.name.includes('IDK'))
         .forEach((obj) => {
           const type = getObjectTypeById(obj.object_type_id)
           // Проверяем, является ли объект выбранным
-          const isSelected = selectedObject && 
-            selectedObject.position.x === obj.x && 
-            selectedObject.position.y === obj.y
-          
+          const isSelected =
+            selectedObject && selectedObject.position.x === obj.x && selectedObject.position.y === obj.y
+
           // Если объект выбран, рисуем зеленую обводку
           if (isSelected) {
             ctx.strokeStyle = '#4CAF50'
             ctx.lineWidth = 3
             ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
           }
-          
+
           ctx.fillStyle = OBJECT_COLORS[type] || DEFAULT_OBJECT_COLOR
           ctx.fillRect(obj.x, obj.y, obj.width, obj.height)
           ctx.strokeStyle = '#A0C4E0'
@@ -269,96 +277,96 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       // Отрисовка маршрута
       if (route && Array.isArray(route) && buildingData) {
         // Новый блок: фильтруем сегменты маршрута, относящиеся к текущему этажу
-        const floorSegments = [];
+        const floorSegments = []
         for (const conn of route) {
-          const fromFloor = findFloorIdByNodeId(conn.from_id);
-          const toFloor = findFloorIdByNodeId(conn.to_id);
+          const fromFloor = findFloorIdByNodeId(conn.from_id)
+          const toFloor = findFloorIdByNodeId(conn.to_id)
           if (fromFloor === currentFloor && toFloor === currentFloor) {
-            floorSegments.push(conn);
+            floorSegments.push(conn)
           }
         }
         if (floorSegments.length > 0) {
-          ctx.save();
-          ctx.strokeStyle = '#4CAF50';
-          ctx.lineWidth = 4;
-          ctx.setLineDash([10, 8]);
-          let totalLength = 0;
-          const segments = [];
+          ctx.save()
+          ctx.strokeStyle = '#4CAF50'
+          ctx.lineWidth = 4
+          ctx.setLineDash([10, 8])
+          let totalLength = 0
+          const segments = []
           for (const conn of floorSegments) {
-            let fromCoord = null;
-            let toCoord = null;
+            let fromCoord = null
+            let toCoord = null
             for (const fl of buildingData.objects.floors) {
               for (const obj of fl.objects) {
                 if (!fromCoord && obj.doors) {
-                  const d = obj.doors.find(d => d.id === conn.from_id);
-                  if (d) fromCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 };
+                  const d = obj.doors.find((d) => d.id === conn.from_id)
+                  if (d) fromCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 }
                 }
                 if (!toCoord && obj.doors) {
-                  const d = obj.doors.find(d => d.id === conn.to_id);
-                  if (d) toCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 };
+                  const d = obj.doors.find((d) => d.id === conn.to_id)
+                  if (d) toCoord = { x: d.x + d.width / 2, y: d.y + d.height / 2 }
                 }
               }
             }
             if (!fromCoord && intersections) {
-              const i = intersections.find(i => i.id === conn.from_id);
-              if (i) fromCoord = { x: i.x, y: i.y };
+              const i = intersections.find((i) => i.id === conn.from_id)
+              if (i) fromCoord = { x: i.x, y: i.y }
             }
             if (!toCoord && intersections) {
-              const i = intersections.find(i => i.id === conn.to_id);
-              if (i) toCoord = { x: i.x, y: i.y };
+              const i = intersections.find((i) => i.id === conn.to_id)
+              if (i) toCoord = { x: i.x, y: i.y }
             }
             if (!fromCoord && nodes) {
-              const n = nodes.find(n => n.id === conn.from_id);
-              if (n) fromCoord = { x: n.x, y: n.y };
+              const n = nodes.find((n) => n.id === conn.from_id)
+              if (n) fromCoord = { x: n.x, y: n.y }
             }
             if (!toCoord && nodes) {
-              const n = nodes.find(n => n.id === conn.to_id);
-              if (n) toCoord = { x: n.x, y: n.y };
+              const n = nodes.find((n) => n.id === conn.to_id)
+              if (n) toCoord = { x: n.x, y: n.y }
             }
             if (!fromCoord) {
               for (const fl of buildingData.objects.floors) {
-                const o = fl.objects.find(o => o.id === conn.from_id);
-                if (o) fromCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 };
+                const o = fl.objects.find((o) => o.id === conn.from_id)
+                if (o) fromCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 }
               }
             }
             if (!toCoord) {
               for (const fl of buildingData.objects.floors) {
-                const o = fl.objects.find(o => o.id === conn.to_id);
-                if (o) toCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 };
+                const o = fl.objects.find((o) => o.id === conn.to_id)
+                if (o) toCoord = { x: o.x + o.width / 2, y: o.y + o.height / 2 }
               }
             }
             if (fromCoord && toCoord) {
-              const dx = toCoord.x - fromCoord.x;
-              const dy = toCoord.y - fromCoord.y;
-              const len = Math.sqrt(dx*dx + dy*dy);
-              segments.push({ from: fromCoord, to: toCoord, length: len });
-              totalLength += len;
+              const dx = toCoord.x - fromCoord.x
+              const dy = toCoord.y - fromCoord.y
+              const len = Math.sqrt(dx * dx + dy * dy)
+              segments.push({ from: fromCoord, to: toCoord, length: len })
+              totalLength += len
             }
           }
-          let drawn = 0;
-          let remain = totalLength * animationProgress;
+          let drawn = 0
+          let remain = totalLength * animationProgress
           for (const seg of segments) {
-            if (remain <= 0) break;
-            const segLen = seg.length;
+            if (remain <= 0) break
+            const segLen = seg.length
             if (remain >= segLen) {
-              ctx.beginPath();
-              ctx.moveTo(seg.from.x, seg.from.y);
-              ctx.lineTo(seg.to.x, seg.to.y);
-              ctx.stroke();
-              remain -= segLen;
+              ctx.beginPath()
+              ctx.moveTo(seg.from.x, seg.from.y)
+              ctx.lineTo(seg.to.x, seg.to.y)
+              ctx.stroke()
+              remain -= segLen
             } else {
-              const t = remain / segLen;
-              const x = seg.from.x + (seg.to.x - seg.from.x) * t;
-              const y = seg.from.y + (seg.to.y - seg.from.y) * t;
-              ctx.beginPath();
-              ctx.moveTo(seg.from.x, seg.from.y);
-              ctx.lineTo(x, y);
-              ctx.stroke();
-              remain = 0;
+              const t = remain / segLen
+              const x = seg.from.x + (seg.to.x - seg.from.x) * t
+              const y = seg.from.y + (seg.to.y - seg.from.y) * t
+              ctx.beginPath()
+              ctx.moveTo(seg.from.x, seg.from.y)
+              ctx.lineTo(x, y)
+              ctx.stroke()
+              remain = 0
             }
           }
-          ctx.setLineDash([]);
-          ctx.restore();
+          ctx.setLineDash([])
+          ctx.restore()
         }
       }
 
@@ -448,19 +456,19 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         const { x, y } = getMouseCoords(e)
         const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
         const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
-        
+
         const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
         const found = objs.find((o) => {
           return scaledX >= o.x && scaledX <= o.x + o.width && scaledY >= o.y && scaledY <= o.y + o.height
         })
-        
+
         if (found) {
           setMovingObject({
             id: found.id,
             initialX: found.x,
             initialY: found.y,
             offsetX: scaledX - found.x,
-            offsetY: scaledY - found.y
+            offsetY: scaledY - found.y,
           })
         }
       }
@@ -474,12 +482,12 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         try {
           if (!buildingId || !currentFloor) return
           const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
-          const obj = objs.find(o => o.id === movingObject.id)
+          const obj = objs.find((o) => o.id === movingObject.id)
           if (obj) {
             await adminApi.updateObject(buildingId, currentFloor, obj.id, {
               ...obj,
               x: obj.x,
-              y: obj.y
+              y: obj.y,
             })
             // Refresh building data
             const updatedData = await api.getObjects(buildingId)
@@ -504,11 +512,11 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         const { x, y } = getMouseCoords(e)
         const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
         const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
-        
+
         if (buildingData) {
           const floor = buildingData.objects.floors.find((f) => f.floor.name === currentFloor)
           if (floor) {
-            const obj = floor.objects.find(o => o.id === movingObject.id)
+            const obj = floor.objects.find((o) => o.id === movingObject.id)
             if (obj) {
               obj.x = scaledX - movingObject.offsetX
               obj.y = scaledY - movingObject.offsetY
@@ -543,9 +551,10 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       switch (mode) {
         case 'select': {
           const objs = buildingData?.objects.floors.find((f) => f.floor.name === currentFloor)?.objects || []
+          const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
+          const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
+          // Try to find object first
           const found = objs.find((o) => {
-            const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
-            const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
             return scaledX >= o.x && scaledX <= o.x + o.width && scaledY >= o.y && scaledY <= o.y + o.height
           })
           if (found) {
@@ -557,7 +566,36 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
               position: { x: found.x, y: found.y },
             })
           } else {
-            setSelectedObject(undefined)
+            // Try to find a door
+            let foundDoor = null
+            let foundObjId = ''
+            for (const obj of objs) {
+              if (obj.doors) {
+                for (const door of obj.doors) {
+                  if (
+                    scaledX >= door.x &&
+                    scaledX <= door.x + door.width &&
+                    scaledY >= door.y &&
+                    scaledY <= door.y + door.height
+                  ) {
+                    foundDoor = door
+                    foundObjId = obj.id
+                    break
+                  }
+                }
+              }
+              if (foundDoor) break
+            }
+            if (foundDoor) {
+              setSelectedObject({
+                id: foundDoor.id,
+                object_id: foundObjId,
+                type: 'door',
+                position: { x: foundDoor.x, y: foundDoor.y, width: foundDoor.width, height: foundDoor.height },
+              })
+            } else {
+              setSelectedObject(undefined)
+            }
           }
           break
         }
@@ -583,7 +621,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
         case 'polygon': {
           const scaledX = (x - transformState.current.offset.x) / transformState.current.scale
           const scaledY = (y - transformState.current.offset.y) / transformState.current.scale
-          setPolygonPoints(prev => [...prev, { x: scaledX, y: scaledY }])
+          setPolygonPoints((prev) => [...prev, { x: scaledX, y: scaledY }])
           setIsPolygonDrawing(true)
           break
         }
@@ -877,15 +915,42 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
             {isInfoBoxVisible ? 'Скрыть панель' : 'Показать панель'}
           </button>
           {isInfoBoxVisible && (
-            <InfoBox
-              buildingData={{
-                name: buildingData.objects.building.name,
-                address: buildingData.objects.building.address,
-                description: buildingData.objects.building.name,
-              }}
-              selectedObject={selectedObject}
-              floorNumber={buildingData.objects.floors.findIndex((f) => f.floor.name === currentFloor) + 1}
-            />
+            (() => {
+              let doorName: string | undefined = undefined;
+              let linkedObjectName: string | undefined = undefined;
+              function isDoor(obj: typeof selectedObject): obj is { id: string; object_id: string; type: 'door'; position: { x: number; y: number; width: number; height: number } } {
+                return !!obj && obj.type === 'door';
+              }
+              if (isDoor(selectedObject) && buildingData) {
+                // Find the object by object_id
+                for (const floor of buildingData.objects.floors) {
+                  for (const obj of floor.objects) {
+                    if (obj.id === selectedObject.object_id) {
+                      linkedObjectName = obj.name;
+                      // Find the door by id
+                      const door = obj.doors?.find((d) => d.id === selectedObject.id);
+                      if (door) {
+                        // Try to use alias or id as name, fallback to id
+                        doorName = obj.name + (obj.doors.length > 1 ? ` (дверь ${obj.doors.indexOf(door) + 1})` : '');
+                      }
+                    }
+                  }
+                }
+              }
+              return (
+                <InfoBox
+                  buildingData={{
+                    name: buildingData.objects.building.name,
+                    address: buildingData.objects.building.address,
+                    description: buildingData.objects.building.name,
+                  }}
+                  selectedObject={selectedObject}
+                  floorNumber={buildingData.objects.floors.findIndex((f) => f.floor.name === currentFloor) + 1}
+                  doorName={doorName}
+                  linkedObjectName={linkedObjectName}
+                />
+              );
+            })()
           )}
         </>
       )}
@@ -900,10 +965,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
 
       {/* Кнопка завершения полигона */}
       {mode === 'polygon' && isPolygonDrawing && polygonPoints.length >= 3 && (
-        <button
-          style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}
-          onClick={finishPolygon}
-        >
+        <button style={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }} onClick={finishPolygon}>
           Завершить полигон
         </button>
       )}

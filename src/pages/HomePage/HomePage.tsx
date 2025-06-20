@@ -120,8 +120,8 @@ const HomePage: React.FC = () => {
       let fromObj = null
       let toObj = null
       for (const floor of buildingData.objects.floors) {
-        if (!fromObj) fromObj = floor.objects.find(o => o.id === from)
-        if (!toObj) toObj = floor.objects.find(o => o.id === to)
+        if (!fromObj) fromObj = floor.objects.find((o) => o.id === from)
+        if (!toObj) toObj = floor.objects.find((o) => o.id === to)
       }
       if (!fromObj || !toObj) {
         setError('Не удалось найти выбранные объекты.')
@@ -220,13 +220,14 @@ const HomePage: React.FC = () => {
     })
   }, [to])
 
-  // Подсчет шагов и времени (примерно)
   const totalDistance = useMemo(() => route?.reduce((sum, e) => sum + (e.weight || 0), 0) || 0, [route])
-  // 1 шаг = 10px
-  const steps = Math.round(totalDistance / 10)
-  // 1 шаг = 0.6 сек
+  const steps = Math.round(totalDistance / 5)
   const seconds = Math.round(steps * 0.6)
-  const timeString = `${seconds} сек`
+
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+
+  const timeString = seconds < 60 ? `${seconds} сек` : `${minutes} мин ${remainingSeconds} сек`
 
   if (isLoading) {
     return <LoadingScreen />
@@ -260,8 +261,8 @@ const HomePage: React.FC = () => {
               value={from}
               options={locationOptions}
             />
-            <Dropdown 
-              placeholder="Куда?" 
+            <Dropdown
+              placeholder="Куда?"
               onChange={(value) => handleLocationChange(value, 'to')}
               buildingId={buildingId}
               searchable={true}
