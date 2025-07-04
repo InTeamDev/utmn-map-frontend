@@ -57,7 +57,6 @@ const Graph3D = ({ nodes, connections }: { nodes: Node[]; connections: Connectio
         const from = nodeMap.get(conn.from_id);
         const to = nodeMap.get(conn.to_id);
         if (!from || !to) return null;
-        // Создаём geometry через useMemo
         const geometry = React.useMemo(() => {
           const points = [
             new THREE.Vector3(from.x - center.x, from.y - center.y, from.type === 'door' ? 10 : 0),
@@ -68,11 +67,11 @@ const Graph3D = ({ nodes, connections }: { nodes: Node[]; connections: Connectio
         return (
           <line key={idx}>
             <primitive object={geometry} attach="geometry" />
-            <primitive object={new THREE.LineBasicMaterial({ color: 0xff9800 })} />
+            <primitive object={new THREE.LineBasicMaterial({ color: 0xff9800, linewidth: 10 })} />
           </line>
         );
       })}
-      <OrbitControls minDistance={20} maxDistance={2000} />
+      <OrbitControls minDistance={1000} maxDistance={2000} />
     </Canvas>
   );
 };
