@@ -41,6 +41,7 @@ const App: React.FC = () => {
               }
             />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/building/:buildingId/object/:objectId" element={<HomePage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </ErrorBoundary>

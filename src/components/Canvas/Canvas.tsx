@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { adminApi } from '../../services/admin.api'
 import { api } from '../../services/public.api'
 import { GetObjectsResponse, ObjectType, getObjectTypeById, OBJECT_TYPE_TO_ID } from '../../services/interfaces/object'
@@ -46,10 +46,12 @@ interface InteractiveCanvasProps {
   showPanel?: boolean
   showEditBtns?: boolean
   route?: any[] | null
+  selectedObjectId?: string
 }
 
-const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false, showEditBtns = false, route }) => {
+const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false, showEditBtns = false, route, selectedObjectId }) => {
   const { buildingId } = useParams<{ buildingId: string }>()
+  const navigate = useNavigate()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [buildingData, setBuildingData] = useState<GetObjectsResponse | null>(null)
   const [currentFloor, setCurrentFloor] = useState<string | null>(null)
@@ -125,6 +127,26 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       if (animationRef.current) cancelAnimationFrame(animationRef.current)
     }
   }, [route])
+
+  // Effect: if selectedObjectId is set, select and zoom to that object
+  useEffect(() => {
+    if (!selectedObjectId || !buildingData) return
+    for (const floor of buildingData.objects.floors) {
+      const obj = floor.objects.find((o) => o.id === selectedObjectId)
+      if (obj) {
+        setCurrentFloor(floor.floor.name)
+        setSelectedObject({
+          name: obj.name || 'Unnamed',
+          alias: obj.alias || '',
+          description: obj.description || '',
+          type: getObjectTypeById(obj.object_type_id),
+          position: { x: obj.x, y: obj.y },
+        })
+        // Removed zoom-in logic
+        break
+      }
+    }
+  }, [selectedObjectId, buildingData])
 
   // Загрузка данных здания
   useEffect(() => {
@@ -232,7 +254,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
           // Если объект выбран, рисуем зеленую обводку
           if (isSelected) {
             ctx.strokeStyle = '#4CAF50'
-            ctx.lineWidth = 3
+            ctx.lineWidth = 6
             ctx.strokeRect(obj.x, obj.y, obj.width, obj.height)
           }
 
@@ -572,6 +594,10 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
               type: getObjectTypeById(found.object_type_id),
               position: { x: found.x, y: found.y },
             })
+            // If not in admin mode, update URL
+            if (!showEditBtns && buildingId) {
+              navigate(`/building/${buildingId}/object/${found.id}`)
+            }
           } else {
             // Try to find a door
             let foundDoor = null
@@ -651,7 +677,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
       canvas.removeEventListener('wheel', wheel)
       canvas.removeEventListener('click', click)
     }
-  }, [mode, buildingData, currentFloor, drawFloor, movingObject])
+  }, [mode, buildingData, currentFloor, drawFloor, movingObject, showEditBtns, buildingId, navigate, selectedObjectId])
 
   const handleCreateObject = async (data: NewObject) => {
     try {

@@ -11,7 +11,7 @@ import { GetObjectsResponse } from '../../services/interfaces/object'
 import RoutePanel from '../../components/RoutePanel/RoutePanel'
 
 const HomePage: React.FC = () => {
-  const { buildingId } = useParams<{ buildingId: string }>()
+  const { buildingId, objectId } = useParams<{ buildingId: string; objectId?: string }>()
   const [currentFloor, setCurrentFloor] = useState('Floor_First')
   const [locations, setLocations] = useState<Record<string, string>>({})
   const [buildingData, setBuildingData] = useState<GetObjectsResponse | null>(null)
@@ -278,7 +278,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
 
-        <InteractiveCanvas showPanel={false} showEditBtns={false} route={route} />
+        <InteractiveCanvas showPanel={false} showEditBtns={false} route={route} selectedObjectId={objectId} />
       </div>
       {/* RoutePanel для мобильной версии */}
       <div className={styles.routePanelMobile}>
