@@ -8,6 +8,7 @@ import NotFoundPage from './pages/NotFoundPage/NotFoundPage'
 import { useAuth, AuthProvider } from './services/auth/AuthContext'
 import BuildingDetails from './pages/BuildingPage/AdminBuildingPage'
 import BuildingsPage from './pages/BuildingsPage/BuildingsPage'
+import GraphPage from './pages/GraphPage'
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth()
@@ -22,6 +23,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<BuildingsPage />} />
             <Route path="/building/:buildingId" element={<HomePage />} />
+            <Route path="/graph" element={<GraphPage />} />
             <Route
               path="/admin"
               element={
