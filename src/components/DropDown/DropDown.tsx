@@ -122,6 +122,8 @@ const Dropdown: React.FC<DropdownProps> = ({
     if (value !== null && value !== undefined) {
       const selectedOption = options.find((option) => option.value === value)
       setInputValue(selectedOption?.label || '')
+    } else {
+      setInputValue('')
     }
   }, [value, options])
 

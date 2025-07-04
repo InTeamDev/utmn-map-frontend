@@ -247,7 +247,14 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
             ctx.font = '18px Arial, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(obj.name || '???', obj.x + obj.width / 2, obj.y + obj.height / 2)
+            const words = (obj.name || '???').split(' ')
+            const lineHeight = 20
+            const centerX = obj.x + obj.width / 2
+            const centerY = obj.y + obj.height / 2
+            const totalHeight = lineHeight * words.length
+            for (let i = 0; i < words.length; i++) {
+              ctx.fillText(words[i], centerX, centerY - totalHeight / 2 + lineHeight / 2 + i * lineHeight)
+            }
           } else {
             // Для остальных объектов - иконки
             const icon = getObjectIcon(type)
@@ -914,24 +921,29 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
           <button className="toggle-infobox-btn" onClick={() => setInfoBoxVisible((v) => !v)}>
             {isInfoBoxVisible ? 'Скрыть панель' : 'Показать панель'}
           </button>
-          {isInfoBoxVisible && (
+          {isInfoBoxVisible &&
             (() => {
-              let doorName: string | undefined = undefined;
-              let linkedObjectName: string | undefined = undefined;
-              function isDoor(obj: typeof selectedObject): obj is { id: string; object_id: string; type: 'door'; position: { x: number; y: number; width: number; height: number } } {
-                return !!obj && obj.type === 'door';
+              let doorName: string | undefined = undefined
+              let linkedObjectName: string | undefined = undefined
+              function isDoor(obj: typeof selectedObject): obj is {
+                id: string
+                object_id: string
+                type: 'door'
+                position: { x: number; y: number; width: number; height: number }
+              } {
+                return !!obj && obj.type === 'door'
               }
               if (isDoor(selectedObject) && buildingData) {
                 // Find the object by object_id
                 for (const floor of buildingData.objects.floors) {
                   for (const obj of floor.objects) {
                     if (obj.id === selectedObject.object_id) {
-                      linkedObjectName = obj.name;
+                      linkedObjectName = obj.name
                       // Find the door by id
-                      const door = obj.doors?.find((d) => d.id === selectedObject.id);
+                      const door = obj.doors?.find((d) => d.id === selectedObject.id)
                       if (door) {
                         // Try to use alias or id as name, fallback to id
-                        doorName = obj.name + (obj.doors.length > 1 ? ` (дверь ${obj.doors.indexOf(door) + 1})` : '');
+                        doorName = obj.name + (obj.doors.length > 1 ? ` (дверь ${obj.doors.indexOf(door) + 1})` : '')
                       }
                     }
                   }
@@ -949,9 +961,8 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({ showPanel = false
                   doorName={doorName}
                   linkedObjectName={linkedObjectName}
                 />
-              );
-            })()
-          )}
+              )
+            })()}
         </>
       )}
 

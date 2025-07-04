@@ -287,3 +287,18 @@ body {
     font-size: 0.9rem;
   }
 }
+
+.adminPageRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+@media (max-width: 668px) {
+  .adminPageRoot {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+}

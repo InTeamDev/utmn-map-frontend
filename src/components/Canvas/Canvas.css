@@ -111,7 +111,7 @@
   align-items: center;
   gap: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  z-index: 200; /* Поверх RoutePanel */
   border: 1px solid var(--border-color);
 }
 
@@ -223,5 +223,10 @@
     right: auto;
     top: 50%;
     transform: translateY(-50%);
+  }
+  .canvas-container {
+    top: 0;
+    height: 100dvh;
+    min-height: 0;
   }
 }

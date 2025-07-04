@@ -220,6 +220,12 @@ const HomePage: React.FC = () => {
     })
   }, [to])
 
+  const handleCloseRoutePanel = () => {
+    setFrom(null);
+    setTo(null);
+    setRoute(null);
+  };
+
   const totalDistance = useMemo(() => route?.reduce((sum, e) => sum + (e.weight || 0), 0) || 0, [route])
   const steps = Math.round(totalDistance / 5)
   const seconds = Math.round(steps * 0.6)
@@ -247,7 +253,7 @@ const HomePage: React.FC = () => {
                 time={timeString}
                 steps={steps}
                 onReverse={handleReverseRoute}
-                onClose={() => setRoute(null)}
+                onClose={handleCloseRoutePanel}
               />
             )}
           </div>
@@ -282,7 +288,7 @@ const HomePage: React.FC = () => {
             time={timeString}
             steps={steps}
             onReverse={handleReverseRoute}
-            onClose={() => setRoute(null)}
+            onClose={handleCloseRoutePanel}
           />
         )}
       </div>
