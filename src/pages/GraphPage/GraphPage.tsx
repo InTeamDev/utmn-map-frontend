@@ -92,7 +92,7 @@ const Graph3D = ({ nodes, connections, objects, floors }: { nodes: Node[]; conne
               <meshStandardMaterial color={0xff0000} />
             </mesh>
             {objectName && (
-              <Html center style={{ pointerEvents: 'none', userSelect: 'none', fontSize: 10, color: '#000', textAlign: 'center', width: 40, fontWeight: 600 }}>
+              <Html center position={[0, 10, 0]} style={{ pointerEvents: 'none', userSelect: 'none', fontSize: 10, color: '#000', textAlign: 'center', width: 40, fontWeight: 600 }}>
                 {objectName}
               </Html>
             )}
