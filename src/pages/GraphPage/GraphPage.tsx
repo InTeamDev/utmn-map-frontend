@@ -9,7 +9,7 @@ import * as THREE from 'three';
 const sphereColor = '#1976d2';
 const lineColor = '#ff9800';
 
-const Graph3D = ({ nodes, connections, objects }: { nodes: Node[]; connections: Connection[]; objects: any[] }) => {
+const Graph3D = ({ nodes, connections, objects, floors }: { nodes: Node[]; connections: Connection[]; objects: any[]; floors: any[] }) => {
   // Преобразуем массив узлов в Map для быстрого доступа по id
   const nodeMap = React.useMemo(() => {
     const map = new Map<string, Node>();
@@ -33,14 +33,27 @@ const Graph3D = ({ nodes, connections, objects }: { nodes: Node[]; connections: 
     };
   }, [nodes]);
 
-  // Мапа floor_id -> индекс этажа (0, 1, 2, ...)
+  // --- Новый floorOrder на основе floors ---
+  // Функция для извлечения номера этажа из name или alias
+  function extractFloorNumber(floor: any): number {
+    // Пробуем найти число в name или alias
+    const str = floor.name || floor.alias || '';
+    const match = str.match(/\d+/);
+    if (match) return parseInt(match[0], 10);
+    // Попытка по ключевым словам (First, Second, ...)
+    if (/first/i.test(str)) return 1;
+    if (/second/i.test(str)) return 2;
+    if (/third/i.test(str)) return 3;
+    if (/fourth/i.test(str)) return 4;
+    return 0; // если не найдено
+  }
   const floorOrder = React.useMemo(() => {
-    const uniqueFloors = Array.from(new Set(nodes.map(n => n.floor_id)));
-    return uniqueFloors.reduce((acc, floorId, idx) => {
-      acc[floorId] = idx;
+    // floors уже отсортированы по номеру этажа
+    return floors.reduce((acc: Record<string, number>, floor: any, idx: number) => {
+      acc[floor.id] = idx;
       return acc;
-    }, {} as Record<string, number>);
-  }, [nodes]);
+    }, {});
+  }, [floors]);
   const FLOOR_GAP = 100;
 
   // Вспомогательная функция для поиска имени объекта по node типа 'door'
@@ -120,6 +133,7 @@ const GraphPage: React.FC = () => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [objects, setObjects] = useState<any[]>([]); // типизировать при необходимости
+  const [floors, setFloors] = useState<any[]>([]); // Новый стейт для этажей
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -135,13 +149,30 @@ const GraphPage: React.FC = () => {
       api.getGraphNodes(selectedBuilding),
       api.getConnections(selectedBuilding),
       api.getObjects(selectedBuilding),
+      api.getFloors(selectedBuilding), // Новый запрос этажей
     ])
-      .then(([nodesRes, connRes, objectsRes]) => {
+      .then(([nodesRes, connRes, objectsRes, floorsRes]) => {
         setNodes(nodesRes.nodes);
         setConnections(connRes.connections);
         // Собираем все объекты всех этажей в один массив
         const allObjects = objectsRes.objects.floors.flatMap((f: any) => f.objects);
         setObjects(allObjects);
+        // Сортируем этажи по номеру
+        const sortedFloors = [...floorsRes.floors].sort((a, b) => {
+          // Используем ту же функцию, что и в Graph3D
+          function extract(f: any) {
+            const str = f.name || f.alias || '';
+            const match = str.match(/\d+/);
+            if (match) return parseInt(match[0], 10);
+            if (/first/i.test(str)) return 1;
+            if (/second/i.test(str)) return 2;
+            if (/third/i.test(str)) return 3;
+            if (/fourth/i.test(str)) return 4;
+            return 0;
+          }
+          return extract(a) - extract(b);
+        });
+        setFloors(sortedFloors);
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -169,7 +200,7 @@ const GraphPage: React.FC = () => {
       {loading && <div>Загрузка...</div>}
       {error && <div style={{ color: 'red' }}>{error}</div>}
       {!loading && !error && nodes.length > 0 && connections.length > 0 && (
-        <Graph3D nodes={nodes} connections={connections} objects={objects} />
+        <Graph3D nodes={nodes} connections={connections} objects={objects} floors={floors} />
       )}
       {!loading && !error && selectedBuilding && nodes.length === 0 && (
         <div>Нет данных для отображения.</div>
