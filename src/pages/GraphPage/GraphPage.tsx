@@ -122,7 +122,15 @@ const Graph3D = ({ nodes, connections, objects, floors }: { nodes: Node[]; conne
           </line>
         );
       })}
-      <OrbitControls minDistance={20} maxDistance={2000} />
+      <OrbitControls 
+        minDistance={20} 
+        maxDistance={2000} 
+        minPolarAngle={0} 
+        maxPolarAngle={Math.PI} 
+        enableRotate={true} 
+        enablePan={true} 
+        enableZoom={true} 
+      />
     </Canvas>
   );
 };
